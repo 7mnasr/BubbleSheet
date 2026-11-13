@@ -4,8 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>البابل شيت الذكي | Smart Bubble Sheet & Error Analytics</title>
+    <!-- Favicon & Home Screen App Icon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231e3a8a'/%3E%3Cstop offset='100%25' stop-color='%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='14' y='16' width='14' height='14' rx='4' fill='none' stroke='%23ffffff' stroke-width='3.5'/%3E%3Cpath d='M17.5 23l3 3 5.5-6' fill='none' stroke='%2334d399' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='34' y1='23' x2='50' y2='23' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Crect x='14' y='36' width='14' height='14' rx='4' fill='none' stroke='%23ffffff' stroke-width='3.5'/%3E%3Cpath d='M17.5 43l3 3 5.5-6' fill='none' stroke='%2334d399' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='34' y1='43' x2='50' y2='43' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" id="apple-touch-icon-link" href="">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="البابل شيت الذكي">
+    <meta name="application-name" content="البابل شيت الذكي">
+    <meta name="theme-color" id="meta-theme-color" content="#1e3a8a">
+
     
-    <!-- Google Fonts: Cairo & Tajawal for crisp Arabic UI + Inter for English options -->
+    <!-- Google Fonts: Cairo & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
@@ -32,11 +40,10 @@
         }
     </script>
 
-    <!-- Phosphor Icons for crisp, uniform icons across all devices -->
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        /* Custom Scrollbars & Smooth Transitions */
         * {
             -webkit-tap-highlight-color: transparent;
         }
@@ -48,7 +55,6 @@
         .font-en {
             font-family: 'Inter', sans-serif;
         }
-        /* Custom scrollbar for question map */
         .custom-scroll::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -63,21 +69,206 @@
         .custom-scroll::-webkit-scrollbar-thumb:hover {
             background: rgba(148, 163, 184, 0.7);
         }
-        /* Blur effect for unrevealed essay answers */
         .essay-blur {
             filter: blur(8px);
             user-select: none;
             pointer-events: none;
         }
-        /* Subtle pulse animation for auto-next feedback */
         @keyframes selectPop {
-            0% { transform: scale(0.98); }
+            0% { transform: scale(0.97); }
             50% { transform: scale(1.015); }
             100% { transform: scale(1); }
         }
         .animate-pop {
-            animation: selectPop 0.18s ease-out;
+            animation: selectPop 0.2s ease-out;
         }
+
+        /* Animated Graphic Tutorial Keyframes */
+        @keyframes floatCursor {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            45% { transform: translate(-18px, -12px) scale(0.92); }
+            55% { transform: translate(-18px, -12px) scale(1.05); }
+        }
+        @keyframes slideUpMsg {
+            0% { opacity: 0; transform: translateY(14px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.45); }
+            50% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
+        }
+        @keyframes typingDot {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        .anim-cursor {
+            animation: floatCursor 2.2s infinite ease-in-out;
+        }
+        .anim-msg-1 {
+            animation: slideUpMsg 0.45s ease-out forwards;
+        }
+        .anim-msg-2 {
+            opacity: 0;
+            animation: slideUpMsg 0.45s ease-out 0.65s forwards;
+        }
+        .anim-msg-3 {
+            opacity: 0;
+            animation: slideUpMsg 0.45s ease-out 1.35s forwards;
+        }
+        .anim-pulse-ring {
+            animation: pulseGlow 2s infinite;
+        }
+        .typing-dot:nth-child(1) { animation: typingDot 1.2s infinite 0s; }
+        .typing-dot:nth-child(2) { animation: typingDot 1.2s infinite 0.2s; }
+        .typing-dot:nth-child(3) { animation: typingDot 1.2s infinite 0.4s; }
+
+        /* ===================================================================== */
+        /* MULTI-COLOR THEMES (PRESERVING DARK & LIGHT MODE)                     */
+        /* ===================================================================== */
+        :root, [data-color-theme="blue"] {
+            --theme-950: #172554;
+            --theme-900: #1e3a8a;
+            --theme-800: #1e40af;
+            --theme-700: #1d4ed8;
+            --theme-600: #2563eb;
+            --theme-500: #3b82f6;
+            --theme-400: #60a5fa;
+            --theme-300: #93c5fd;
+            --theme-200: #bfdbfe;
+            --theme-100: #dbeafe;
+            --theme-50:  #eff6ff;
+            --theme-950-alpha: rgba(23, 37, 84, 0.55);
+            --theme-900-alpha: rgba(30, 58, 138, 0.45);
+            --theme-500-alpha: rgba(59, 130, 246, 0.14);
+        }
+        [data-color-theme="pink"] {
+            --theme-950: #500724;
+            --theme-900: #831843;
+            --theme-800: #9d174d;
+            --theme-700: #be185d;
+            --theme-600: #db2777;
+            --theme-500: #ec4899;
+            --theme-400: #f472b6;
+            --theme-300: #f9a8d4;
+            --theme-200: #fbcfe8;
+            --theme-100: #fce7f3;
+            --theme-50:  #fdf2f8;
+            --theme-950-alpha: rgba(80, 7, 36, 0.55);
+            --theme-900-alpha: rgba(131, 24, 67, 0.45);
+            --theme-500-alpha: rgba(236, 72, 153, 0.14);
+        }
+        [data-color-theme="green"] {
+            --theme-950: #022c22;
+            --theme-900: #064e3b;
+            --theme-800: #065f46;
+            --theme-700: #047857;
+            --theme-600: #059669;
+            --theme-500: #10b981;
+            --theme-400: #34d399;
+            --theme-300: #6ee7b7;
+            --theme-200: #a7f3d0;
+            --theme-100: #d1fae5;
+            --theme-50:  #ecfdf5;
+            --theme-950-alpha: rgba(2, 44, 34, 0.55);
+            --theme-900-alpha: rgba(6, 78, 59, 0.45);
+            --theme-500-alpha: rgba(16, 185, 129, 0.14);
+        }
+        [data-color-theme="red"] {
+            --theme-950: #450a0a;
+            --theme-900: #7f1d1d;
+            --theme-800: #991b1b;
+            --theme-700: #b91c1c;
+            --theme-600: #dc2626;
+            --theme-500: #ef4444;
+            --theme-400: #f87171;
+            --theme-300: #fca5a5;
+            --theme-200: #fecaca;
+            --theme-100: #fee2e2;
+            --theme-50:  #fef2f2;
+            --theme-950-alpha: rgba(69, 10, 10, 0.55);
+            --theme-900-alpha: rgba(127, 29, 29, 0.45);
+            --theme-500-alpha: rgba(239, 68, 68, 0.14);
+        }
+        [data-color-theme="purple"] {
+            --theme-950: #2e1065;
+            --theme-900: #4c1d95;
+            --theme-800: #5b21b6;
+            --theme-700: #6d28d9;
+            --theme-600: #7c3aed;
+            --theme-500: #8b5cf6;
+            --theme-400: #a78bfa;
+            --theme-300: #c4b5fd;
+            --theme-200: #ddd6fe;
+            --theme-100: #ede9fe;
+            --theme-50:  #f5f3ff;
+            --theme-950-alpha: rgba(46, 16, 101, 0.55);
+            --theme-900-alpha: rgba(76, 29, 149, 0.45);
+            --theme-500-alpha: rgba(139, 92, 246, 0.14);
+        }
+
+        /* Map existing blue classes dynamically when theme != blue */
+        html[data-color-theme]:not([data-color-theme="blue"]) .bg-blue-900 { background-color: var(--theme-900) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .bg-blue-800 { background-color: var(--theme-800) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .bg-blue-700 { background-color: var(--theme-700) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .bg-blue-600 { background-color: var(--theme-600) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .bg-blue-100 { background-color: var(--theme-100) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .bg-blue-50 { background-color: var(--theme-50) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .bg-blue-50\/70 { background-color: var(--theme-50) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .bg-blue-50\/80 { background-color: var(--theme-50) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .bg-blue-50\/60 { background-color: var(--theme-50) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .bg-blue-900\/10 { background-color: var(--theme-500-alpha) !important; }
+
+        html[data-color-theme]:not([data-color-theme="blue"]) .hover\:bg-blue-800:hover { background-color: var(--theme-800) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .hover\:bg-blue-100:hover { background-color: var(--theme-100) !important; }
+
+        html[data-color-theme]:not([data-color-theme="blue"]) .text-blue-950 { color: var(--theme-950) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .text-blue-900 { color: var(--theme-900) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .text-blue-800 { color: var(--theme-800) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .text-blue-700 { color: var(--theme-700) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .text-blue-200 { color: var(--theme-200) !important; }
+
+        html[data-color-theme]:not([data-color-theme="blue"]) .border-blue-800 { border-color: var(--theme-800) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .border-blue-700 { border-color: var(--theme-700) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .hover\:border-blue-800:hover { border-color: var(--theme-800) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .hover\:border-blue-700:hover { border-color: var(--theme-700) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .focus\:border-blue-800:focus { border-color: var(--theme-800) !important; }
+        html[data-color-theme]:not([data-color-theme="blue"]) .ring-blue-600 { --tw-ring-color: var(--theme-600) !important; }
+
+        /* Gradients override for non-blue themes */
+        html[data-color-theme]:not([data-color-theme="blue"]) .from-blue-950 {
+            --tw-gradient-from: var(--theme-950) var(--tw-gradient-from-position) !important;
+            --tw-gradient-to: transparent var(--tw-gradient-to-position) !important;
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+        }
+        html[data-color-theme]:not([data-color-theme="blue"]) .via-blue-900 {
+            --tw-gradient-to: transparent var(--tw-gradient-to-position) !important;
+            --tw-gradient-stops: var(--tw-gradient-from), var(--theme-900) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+        }
+        html[data-color-theme]:not([data-color-theme="blue"]) .from-blue-900 {
+            --tw-gradient-from: var(--theme-900) var(--tw-gradient-from-position) !important;
+            --tw-gradient-to: transparent var(--tw-gradient-to-position) !important;
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+        }
+        html[data-color-theme]:not([data-color-theme="blue"]) .to-indigo-800 {
+            --tw-gradient-to: var(--theme-700) var(--tw-gradient-to-position) !important;
+        }
+
+        /* Dark mode variants for custom themes */
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:bg-blue-950\/60 { background-color: var(--theme-950-alpha) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:bg-blue-950\/40 { background-color: var(--theme-950-alpha) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:bg-blue-950 { background-color: var(--theme-950) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:bg-blue-900\/50 { background-color: var(--theme-900-alpha) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:bg-blue-900\/40 { background-color: var(--theme-900-alpha) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:bg-blue-800 { background-color: var(--theme-800) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:bg-blue-700 { background-color: var(--theme-700) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:bg-blue-500 { background-color: var(--theme-500) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:text-blue-400 { color: var(--theme-400) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:text-blue-300 { color: var(--theme-300) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:text-blue-200 { color: var(--theme-200) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:border-blue-600 { border-color: var(--theme-600) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:hover\:border-blue-500:hover { border-color: var(--theme-500) !important; }
+        html.dark[data-color-theme]:not([data-color-theme="blue"]) .dark\:ring-blue-400 { --tw-ring-color: var(--theme-400) !important; }
+
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
@@ -100,6 +291,17 @@
 
             <!-- Navigation Actions -->
             <div class="flex items-center gap-1.5 sm:gap-2.5">
+                <!-- User Profile Pill (Opens Profile & Theme Settings) -->
+                <button onclick="openProfileSettingsModal()" id="header-user-pill" class="px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 transition-colors" title="ملفي الشخصي والألوان">
+                    <i id="header-user-icon" class="ph-fill ph-user-circle text-lg text-blue-900 dark:text-blue-400"></i>
+                    <span id="header-user-name" class="max-w-[85px] sm:max-w-[120px] truncate">حسابي</span>
+                </button>
+                <!-- Tutorial Guide Button (Always accessible) -->
+                <button onclick="openTutorialFromStart()" class="px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 transition-colors" title="شرح طريقة استخدام الموقع">
+                    <i class="ph-bold ph-question text-lg"></i>
+                    <span class="hidden sm:inline">شرح الاستخدام</span>
+                </button>
+
                 <!-- Home Button -->
                 <button onclick="navigateTo('home')" id="nav-home-btn" class="px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors bg-blue-50 text-blue-900 dark:bg-blue-950/60 dark:text-blue-300">
                     <i class="ph-bold ph-house text-lg"></i>
@@ -133,17 +335,17 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-8">
 
         <!-- ================================================================= -->
-        <!-- VIEW 1: HOME VIEW (UPLOAD, AI PROMPT, METADATA & ARCHIVE)         -->
+        <!-- VIEW 1: HOME VIEW (UPLOAD, MANUAL ENTRY, AI PROMPT & ARCHIVE)     -->
         <!-- ================================================================= -->
         <section id="view-home" class="space-y-8">
             
             <!-- Hero / Upload & AI Generator Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                 
-                <!-- Upload Answer Key Card (7 cols on lg) -->
+                <!-- Upload Answer Key / Manual Entry Card (7 cols on lg) -->
                 <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between gap-2 mb-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-300">
                                 <i class="ph-fill ph-sparkle"></i> خطوة ١: ابدأ واجب جديد
                             </span>
@@ -152,27 +354,39 @@
                             </button>
                         </div>
 
-                        <h2 class="text-xl sm:text-2xl font-extrabold mb-2">ارفع ملف نموذج الإجابة (.json)</h2>
+                        <h2 id="home-welcome-heading" class="text-xl sm:text-2xl font-extrabold mb-2">ابدأ بابل شيت بالذكاء الاصطناعي أو يدوياً</h2>
                         <p class="text-sm text-slate-500 dark:text-slate-400 mb-5">
-                            ارفع ملف الإجابات المستخرج من الذكاء الاصطناعي، وهنفتحلك بابل شيت ذكي يصححلك أوتوماتيك ويحلل غلطاتك.
+                            ارفع ملف الإجابات المستخرج من Gemini، أو أنشئ بابل شيت يدوي فوري بعدد الأسئلة اللي معاك.
                         </p>
 
-                        <!-- Drag & Drop Zone -->
-                        <label id="drop-zone" class="cursor-pointer group flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-800 dark:hover:border-blue-500 rounded-2xl p-6 sm:p-8 bg-slate-50/70 dark:bg-slate-800/40 transition-all text-center">
-                            <input type="file" id="json-file-input" accept=".json,application/json" class="hidden" onchange="handleFileUpload(event)">
-                            <div class="w-14 h-14 rounded-2xl bg-blue-900/10 dark:bg-blue-500/10 text-blue-900 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                <i class="ph-bold ph-file-arrow-up text-3xl"></i>
-                            </div>
-                            <span class="font-bold text-base sm:text-lg text-slate-800 dark:text-slate-100">اضغط لاختيار الملف أو اسحبه هنا</span>
-                            <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">يدعم ملفات JSON المستخرجة من Gemini أو ChatGPT</span>
-                        </label>
+                        <!-- Two Start Paths Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                            <!-- Drag & Drop JSON Zone (7 cols) -->
+                            <label id="drop-zone" class="sm:col-span-7 cursor-pointer group flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-800 dark:hover:border-blue-500 rounded-2xl p-5 sm:p-6 bg-slate-50/70 dark:bg-slate-800/40 transition-all text-center">
+                                <input type="file" id="json-file-input" accept=".json,application/json" class="hidden" onchange="handleFileUpload(event)">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-900/10 dark:bg-blue-500/10 text-blue-900 dark:text-blue-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+                                    <i class="ph-bold ph-file-arrow-up text-2xl"></i>
+                                </div>
+                                <span class="font-extrabold text-sm sm:text-base text-slate-800 dark:text-slate-100">ارفع ملف نموذج الإجابة (.json)</span>
+                                <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">اسحب الملف هنا أو اضغط للاختيار</span>
+                            </label>
+
+                            <!-- Manual Entry Card Button (5 cols) -->
+                            <button type="button" onclick="openManualSetupModal()" class="sm:col-span-5 group flex flex-col items-center justify-center border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-600 dark:hover:border-emerald-500 rounded-2xl p-5 sm:p-6 bg-emerald-50/40 dark:bg-emerald-950/20 transition-all text-center active:scale-95">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-600/15 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+                                    <i class="ph-bold ph-pencil-ruler text-2xl"></i>
+                                </div>
+                                <span class="font-extrabold text-sm sm:text-base text-slate-800 dark:text-slate-100">إدخال يدوي سريع</span>
+                                <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">حدد عدد الأسئلة وحل أو حط النموذج بنفسك</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Don't Have a File? AI Prompt Trigger -->
                     <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
                         <div class="text-center sm:text-right">
                             <p class="font-bold text-sm text-slate-800 dark:text-slate-200">معندكش ملف إجابات جاهز؟</p>
-                            <p class="text-xs text-slate-500 dark:text-slate-400">صوّر نموذج الإجابة وانسخ البرومت السحري لأي ذكاء اصطناعي</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">صوّر نموذج الإجابة وانسخ البرومت السحري لـ Gemini</p>
                         </div>
                         <button onclick="openAiPromptModal()" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-l from-blue-900 to-indigo-800 hover:from-blue-800 hover:to-indigo-700 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all active:scale-95">
                             <i class="ph-bold ph-magic-wand text-lg"></i>
@@ -296,6 +510,24 @@
         <!-- ================================================================= -->
         <section id="view-solve" class="hidden space-y-4">
             
+            <!-- Manual Two-Phase Banner (Shown ONLY when in Manual Two-Phase Mode) -->
+            <div id="manual-phase-banner" class="hidden rounded-2xl p-3.5 sm:p-4 border-2 flex flex-wrap items-center justify-between gap-3 animate-pop">
+                <div class="flex items-center gap-3">
+                    <div id="manual-phase-icon" class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+                        <i class="ph-bold ph-pencil-simple text-xl"></i>
+                    </div>
+                    <div>
+                        <span id="manual-phase-step-badge" class="text-[11px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-md">المرحلة ١ من ٢</span>
+                        <h3 id="manual-phase-title" class="font-black text-sm sm:text-base mt-0.5">أنت الآن تسجّل إجاباتك</h3>
+                        <p id="manual-phase-desc" class="text-xs opacity-85">اختر إجاباتك لكل سؤال، ولما تخلص هننقلك تحط نموذج الإجابة الصح للتصحيح الفوري.</p>
+                    </div>
+                </div>
+                <button type="button" id="manual-phase-switch-btn" onclick="handleManualPhaseAction()" class="px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm shadow-sm flex items-center gap-1.5 transition-all active:scale-95">
+                    <span>انتقل للخطوة التالية</span>
+                    <i class="ph-bold ph-arrow-left"></i>
+                </button>
+            </div>
+
             <!-- Top Control Bar -->
             <div class="bg-white dark:bg-slate-900 rounded-2xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-3">
                 <!-- Homework Meta Info -->
@@ -347,7 +579,13 @@
                                 <span id="q-type-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">اختيار من متعدد</span>
                             </div>
 
-                            <div class="flex items-center gap-2">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <!-- Split into Sub-questions Button -->
+                                <button type="button" id="split-subq-btn" onclick="openSubQuestionsModal()" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-colors flex items-center gap-1" title="تقسيم هذا السؤال إلى عدة مطاليب بنفس رقمه">
+                                    <i class="ph-bold ph-git-fork text-base"></i>
+                                    <span>+ فرّع السؤال لمطاليب</span>
+                                </button>
+
                                 <!-- Clear Selection Button -->
                                 <button type="button" id="clear-answer-btn" onclick="clearCurrentAnswer()" class="px-3 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors flex items-center gap-1" title="مسح إجابة هذا السؤال">
                                     <i class="ph-bold ph-eraser text-base"></i>
@@ -362,9 +600,23 @@
                             </div>
                         </div>
 
+                        <!-- Retry Question Attachment Display (If question has saved text or image!) -->
+                        <div id="retry-attachment-box" class="hidden mb-6 p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-extrabold text-indigo-800 dark:text-indigo-300 flex items-center gap-1.5">
+                                    <i class="ph-bold ph-book-open-text text-base"></i> نص / صورة السؤال المحفوظة:
+                                </span>
+                                <span id="retry-origin-meta" class="text-[11px] font-bold text-slate-500 dark:text-slate-400"></span>
+                            </div>
+                            <p id="retry-q-text" class="hidden text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 leading-relaxed whitespace-pre-line"></p>
+                            <div id="retry-q-img-wrap" class="hidden">
+                                <img id="retry-q-img" src="" alt="صورة السؤال" onclick="openImageLightbox(this.src)" class="max-h-64 rounded-xl border border-slate-300 dark:border-slate-700 cursor-zoom-in object-contain bg-white">
+                            </div>
+                        </div>
+
                         <!-- MCQ Bubbles Area -->
                         <div id="mcq-container" class="space-y-3 sm:space-y-4">
-                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-2">اختر الإجابة الصحيحة من البابل شيت (أو استخدم الكيبورد 1-4):</p>
+                            <p id="mcq-instruction-text" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-2">اختر الإجابة الصحيحة من البابل شيت (أو استخدم الكيبورد 1-4):</p>
                             <div id="mcq-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <!-- 4 Bubble Options injected dynamically -->
                             </div>
@@ -412,9 +664,9 @@
                             <span>السابق</span>
                         </button>
 
-                        <button type="button" onclick="initiateSubmitHomework()" class="px-5 sm:px-7 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm sm:text-base shadow-md flex items-center gap-2 transition-all active:scale-95">
+                        <button type="button" id="main-submit-btn" onclick="initiateSubmitHomework()" class="px-5 sm:px-7 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm sm:text-base shadow-md flex items-center gap-2 transition-all active:scale-95">
                             <i class="ph-bold ph-paper-plane-tilt text-lg"></i>
-                            <span>تسليم الواجب</span>
+                            <span id="main-submit-btn-text">تسليم الواجب</span>
                         </button>
 
                         <button type="button" id="next-q-btn" onclick="nextQuestion()" class="px-5 py-3.5 rounded-2xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm sm:text-base flex items-center gap-2 transition-all disabled:opacity-40">
@@ -436,7 +688,7 @@
 
                     <!-- Color Legend -->
                     <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800">
-                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-900 inline-block"></span> متجاوب</span>
+                        <span class="flex items-center gap-1"><span id="legend-answered-dot" class="w-3 h-3 rounded bg-blue-900 inline-block"></span> <span id="legend-answered-label">متجاوب</span></span>
                         <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-slate-200/70 dark:bg-slate-800 inline-block"></span> فاضي</span>
                         <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> مراجعة</span>
                     </div>
@@ -513,7 +765,7 @@
                     <button onclick="setDashboardFilter('partial')" data-dfilter="partial" class="dash-filter-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">الجزئي / المتروك 🟡</button>
                     <button onclick="setDashboardFilter('flagged')" data-dfilter="flagged" class="dash-filter-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">المعلّم بـ Flag 🚩</button>
                 </div>
-                <p class="text-xs text-slate-500 dark:text-slate-400 px-2">حدّد سبب كل غلطة عشان تتسجل في أرشيف "أخطائي"</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 px-2">تقدر ترفق نص أو صورة لكل سؤال غلط عشان تلاقيه في وشك لما تراجع!</p>
             </div>
 
             <!-- Question Review & Error Analysis Cards -->
@@ -535,7 +787,7 @@
                         بنك أخطائي وتحليل المستوى
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                        هنا متجمع كل سؤال غلطت فيه متقسم بالمادة، الدرس، واسم الكتاب عشان تراجعه وتختبر نفسك فيه تاني.
+                        هنا متجمع كل سؤال غلطت فيه متقسم بالمادة، الدرس، واسم الكتاب مع نص أو صورة السؤال عشان تراجعه وتختبر نفسك فيه تاني.
                     </p>
                 </div>
 
@@ -611,8 +863,307 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- MODALS & TOAST NOTIFICATIONS                                          -->
+    <!-- MODALS & INTERACTIVE ONBOARDING TUTORIAL                              -->
     <!-- ===================================================================== -->
+
+    <!-- MODAL 0: FIRST-TIME WELCOME & INTERACTIVE GRAPHIC TUTORIAL -->
+    <div id="onboarding-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-5 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden flex flex-col max-h-[92vh]">
+            
+            <!-- Permanent Dismiss X Button (Every Step) -->
+            <button onclick="dismissTutorialForever()" class="absolute top-4 left-4 z-10 w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 dark:hover:bg-rose-950/60 text-slate-500 flex items-center justify-center transition-colors" title="إغلاق الشرح نهائياً">
+                <i class="ph-bold ph-x text-lg"></i>
+            </button>
+
+            <!-- STEP 0: WELCOME QUESTION -->
+            <div id="tut-step-0" class="text-center py-4 sm:py-6 space-y-5 animate-pop">
+                <div class="w-16 h-16 rounded-2xl bg-blue-900 text-white flex items-center justify-center mx-auto shadow-lg">
+                    <i class="ph-bold ph-hand-waving text-3xl"></i>
+                </div>
+                <div class="space-y-2 max-w-md mx-auto">
+                    <h2 class="text-2xl sm:text-3xl font-black">أهلاً بيك في البابل شيت الذكي! 👋</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                        منصتك الذكية للتصحيح الفوري، متابعة مستواك، وتجميع كل غلطاتك بالكتاب والدرس عشان تقفّل أي مادة.
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 max-w-md mx-auto">
+                    <p class="font-extrabold text-sm sm:text-base mb-3">هل عارف طريقة استخدام التطبيق قبل كده؟</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <button onclick="dismissTutorialForever()" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow transition-all active:scale-95">
+                            أيوه، عارف ✅
+                        </button>
+                        <button onclick="goToTutorialStep(1)" class="py-3 px-4 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-extrabold text-sm shadow transition-all active:scale-95 flex items-center justify-center gap-1.5">
+                            <i class="ph-bold ph-play-circle text-lg"></i>
+                            <span>لأ، ورّيني الشرح</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 1: ANIMATED GRAPHIC VIDEO - GEMINI CHAT + PROMPT + IMAGES -> JSON -->
+            <div id="tut-step-1" class="hidden space-y-4 overflow-y-auto custom-scroll pr-1 animate-pop">
+                <div class="flex items-center gap-2 text-xs font-extrabold text-blue-800 dark:text-blue-400">
+                    <span class="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950">خطوة ١ من ٣</span>
+                    <span>ازاي تحوّل صور نموذج الإجابة لملف جاهز؟</span>
+                </div>
+
+                <h3 class="text-lg sm:text-xl font-black">فيديو توضيحي: المحادثة السحرية مع Gemini ✨</h3>
+
+                <!-- HTML/CSS Motion Graphic Mockup of Gemini Chat -->
+                <div class="rounded-2xl bg-slate-950 text-slate-100 p-4 sm:p-5 border border-slate-800 shadow-inner space-y-3 relative overflow-hidden">
+                    <!-- Fake Browser Top Bar -->
+                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-800 text-[11px] text-slate-400">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span class="mr-2 font-en text-slate-300 font-semibold">gemini.google.com</span>
+                        </div>
+                        <button onclick="replayTutorialAnimation(1)" class="text-blue-400 hover:text-blue-300 flex items-center gap-1 font-bold">
+                            <i class="ph-bold ph-arrow-counter-clockwise"></i> إعادة الحركة
+                        </button>
+                    </div>
+
+                    <!-- Chat Sequence -->
+                    <div id="tut-anim-stage-1" class="space-y-3 py-1">
+                        <!-- User sends images + prompt -->
+                        <div class="anim-msg-1 flex flex-col items-start gap-1.5 max-w-[88%]">
+                            <div class="flex items-center gap-2">
+                                <div class="px-2.5 py-1.5 rounded-xl bg-indigo-900/70 border border-indigo-500/40 text-xs flex items-center gap-1.5">
+                                    <i class="ph-fill ph-image text-amber-300 text-base"></i>
+                                    <span>صورة_الإجابات_1.jpg</span>
+                                </div>
+                                <div class="px-2.5 py-1.5 rounded-xl bg-indigo-900/70 border border-indigo-500/40 text-xs flex items-center gap-1.5">
+                                    <i class="ph-fill ph-image text-amber-300 text-base"></i>
+                                    <span>صورة_الإجابات_2.jpg</span>
+                                </div>
+                            </div>
+                            <div class="px-3.5 py-2.5 rounded-2xl rounded-tr-sm bg-blue-600 text-white text-xs leading-relaxed shadow">
+                                📋 <strong>[لصق البرومت المنسوخ من الموقع]</strong><br>
+                                استخرج كل الأسئلة والإجابات بصيغة JSON...
+                            </div>
+                        </div>
+
+                        <!-- Gemini Thinking & Replying with JSON File -->
+                        <div class="anim-msg-2 flex flex-col items-end gap-1.5">
+                            <div class="flex items-center gap-1.5 text-[11px] text-sky-400 font-bold">
+                                <i class="ph-fill ph-sparkle"></i>
+                                <span>Gemini يحلل الصور...</span>
+                                <span class="inline-flex gap-1 mr-1">
+                                    <span class="typing-dot w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                                    <span class="typing-dot w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                                    <span class="typing-dot w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                                </span>
+                            </div>
+                            <div class="p-3 rounded-2xl rounded-tl-sm bg-slate-900 border border-emerald-500/40 flex items-center justify-between gap-4 w-full sm:w-80 shadow-lg">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                        <i class="ph-bold ph-file-code text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-en text-xs font-bold text-white block">answers_key.json</span>
+                                        <span class="text-[10px] text-emerald-400">50 سؤال جاهز للتحميل</span>
+                                    </div>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold flex items-center gap-1">
+                                    <i class="ph-bold ph-download-simple"></i> تحميل
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Uploading into Smart Bubble Sheet -->
+                        <div class="anim-msg-3 pt-1">
+                            <div class="p-3 rounded-xl bg-blue-950/80 border border-blue-500/40 flex items-center justify-between gap-2 relative">
+                                <div class="flex items-center gap-2 text-xs font-bold text-blue-200">
+                                    <i class="ph-bold ph-upload-simple text-lg text-emerald-400"></i>
+                                    <span>ترفع ملف <code class="font-en text-amber-300">answers_key.json</code> هنا في الموقع!</span>
+                                </div>
+                                <i class="ph-fill ph-cursor text-xl text-white anim-cursor"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <strong>ملخص الخطوة:</strong> بتدوس زرار <strong>"معندكش ملف؟ انسخ البرومت"</strong> في الرئيسية، تبعته لـ Gemini مع صور الإجابات، وتنزل ملف الـ <code class="font-en">JSON</code> وترفعه هنا (أو تستخدم الإدخال اليدوي لو معكش صور!).
+                </p>
+
+                <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <button onclick="goToTutorialStep(0)" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">السابق</button>
+                    <button onclick="goToTutorialStep(2)" class="px-6 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow">
+                        <span>الخطوة التالية: الحل والتصحيح</span>
+                        <i class="ph-bold ph-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: ANIMATED GRAPHIC - SOLVING MODES & PARTIAL SUBMISSION -->
+            <div id="tut-step-2" class="hidden space-y-4 overflow-y-auto custom-scroll pr-1 animate-pop">
+                <div class="flex items-center gap-2 text-xs font-extrabold text-emerald-700 dark:text-emerald-400">
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950">خطوة ٢ من ٣</span>
+                    <span>ازاي تحل وتسلّم واجبك بذكاء؟</span>
+                </div>
+
+                <h3 class="text-lg sm:text-xl font-black">بابل شيت ذكي بوضعين للحل وتسليم مرن ⚡</h3>
+
+                <!-- Graphic Illustration -->
+                <div class="rounded-2xl bg-slate-100 dark:bg-slate-800/70 p-4 border border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                        <div class="flex items-center gap-2 font-extrabold text-xs text-blue-900 dark:text-blue-400">
+                            <i class="ph-fill ph-lightning text-amber-500 text-base"></i>
+                            <span>النمط السريع vs النمط العادي</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                            لو بتنقل إجاباتك من الكراسة بسرعة، فعّل <strong>النمط السريع</strong> وهينقلك للسؤال اللي بعده أوتوماتيك أول ما تختار!
+                        </p>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                        <div class="flex items-center gap-2 font-extrabold text-xs text-emerald-700 dark:text-emerald-400">
+                            <i class="ph-bold ph-check-circle text-base"></i>
+                            <span>التسليم الجزئي الذكي</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                            حليت ٢٠ سؤال من ٥٠ بس؟ اختار <strong>"هسلم دول بس"</strong> وهيصححلك الـ ٢٠ من غير ما يحرقلك إجابات الباقي!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <button onclick="goToTutorialStep(1)" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">السابق</button>
+                    <button onclick="goToTutorialStep(3)" class="px-6 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow">
+                        <span>الخطوة التالية: بنك أخطائي</span>
+                        <i class="ph-bold ph-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: ANIMATED GRAPHIC - MY MISTAKES + ATTACHING QUESTION IMAGE/TEXT + COMPLETION -->
+            <div id="tut-step-3" class="hidden space-y-4 overflow-y-auto custom-scroll pr-1 animate-pop">
+                <div class="flex items-center gap-2 text-xs font-extrabold text-rose-700 dark:text-rose-400">
+                    <span class="px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950">خطوة ٣ من ٣</span>
+                    <span>سر التفوق: أرشيف "أخطائي"</span>
+                </div>
+
+                <h3 class="text-lg sm:text-xl font-black">احفظ صورة السؤال الغلط واختبر نفسك فيه! 🎯</h3>
+
+                <div class="p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 space-y-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-200">
+                    <div class="flex items-start gap-2.5">
+                        <i class="ph-bold ph-camera-plus text-xl text-rose-600 shrink-0 mt-0.5"></i>
+                        <p>بعد التسليم، تقدر تكتب <strong>نص السؤال أو ترفع صورته</strong> تحت كل غلطة، عشان لما تفتح <strong>"أخطائي"</strong> أو تدوس <strong>"اختبرني في غلطاتي"</strong> تلاقي السؤال قدامك من غير ما تقلب في الكتب!</p>
+                    </div>
+                </div>
+
+                <!-- Completion Confirmation Box -->
+                <div class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-500/40 text-center space-y-2">
+                    <div class="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-black text-base">
+                        <i class="ph-fill ph-confetti text-2xl"></i>
+                        <span>إنت كده فهمت الموقع بالكامل! 🎉</span>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300">
+                        لو عزت تشوف الشرح ده تاني في أي وقت، اضغط على زرار
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 font-extrabold">
+                            <i class="ph-bold ph-question"></i> شرح الاستخدام
+                        </span>
+                        اللي في الشريط فوق!
+                    </p>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <button onclick="goToTutorialStep(2)" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">السابق</button>
+                    <button onclick="dismissTutorialForever()" class="px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-lg flex items-center gap-2 transition-transform active:scale-95">
+                        <span>يلا نبدأ المذاكرة!</span>
+                        <i class="ph-bold ph-rocket-launch text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL 0.5: MANUAL HOMEWORK CREATION MODAL -->
+    <div id="manual-setup-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full p-5 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-2xl max-h-[92vh] overflow-y-auto custom-scroll space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
+                        <i class="ph-bold ph-pencil-ruler text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-base sm:text-lg">إنشاء بابل شيت يدوي</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">اكتب بيانات الواجب وعدد الأسئلة واختار تبدأ بإيه</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('manual-setup-modal')" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <form id="manual-homework-form" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">المادة الدراسية *</label>
+                        <input type="text" id="man-subject" list="subjects-datalist" required placeholder="مثال: كيمياء" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">اسم الكتاب / المصدر *</label>
+                        <input type="text" id="man-book" required placeholder="مثال: كتاب مندليف" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">رقم الفصل / الباب *</label>
+                        <input type="text" id="man-chapter" required placeholder="مثال: الباب الثاني" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">رقم / اسم الدرس *</label>
+                        <input type="text" id="man-lesson" required placeholder="مثال: الدرس الأول" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold">
+                    </div>
+                </div>
+
+                <!-- Question Count & Language -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-start">
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">إجمالي عدد الأسئلة *</label>
+                        <input type="number" id="man-qcount" min="1" max="300" required placeholder="مثال: 30" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-slate-700 dark:text-slate-300">لغة الاختيارات</label>
+                        <select id="man-lang" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold">
+                            <option value="ar">عربي (أ - ب - ج - د)</option>
+                            <option value="en">أجنبي / إنجليزي (A - B - C - D)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Important Note about Multi-part Questions -->
+                <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2">
+                    <i class="ph-fill ph-info text-lg text-amber-600 shrink-0 mt-0.5"></i>
+                    <span><strong>معلومة ذكية:</strong> اكتب عدد الأسئلة الأساسية زي الكتاب بالظبط، وجوه شاشة الحل تقدر تضغط على <strong>"+ فرّع السؤال لمطاليب"</strong> عند أي سؤال فيه نقط متعددة عشان الترقيم يفضل مطابق للكتاب!</span>
+                </div>
+
+                <!-- Two Start Mode Buttons -->
+                <div class="pt-2 space-y-2">
+                    <label class="block text-xs font-extrabold text-slate-700 dark:text-slate-300">تحب تبدأ بإيه دلوقتي؟</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button type="button" onclick="startManualHomework('user_first')" class="p-4 rounded-2xl border-2 border-blue-800 bg-blue-50/70 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-right transition-all group">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-black text-sm text-blue-950 dark:text-blue-200">١. أبدأ بإجاباتي أنا ✍️</span>
+                                <i class="ph-bold ph-arrow-left text-blue-800 dark:text-blue-400"></i>
+                            </div>
+                            <p class="text-[11px] text-slate-600 dark:text-slate-400">تحل الأسئلة الأول، وبعد آخر سؤال تدخّل نموذج الإجابة الصح فيتصحح فوراً.</p>
+                        </button>
+
+                        <button type="button" onclick="startManualHomework('key_first')" class="p-4 rounded-2xl border-2 border-emerald-600 bg-emerald-50/70 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-right transition-all group">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-black text-sm text-emerald-950 dark:text-emerald-200">٢. أبدأ بنموذج الإجابة ✅</span>
+                                <i class="ph-bold ph-arrow-left text-emerald-700 dark:text-emerald-400"></i>
+                            </div>
+                            <p class="text-[11px] text-slate-600 dark:text-slate-400">تسجل الإجابات الصح من النموذج الأول، وبعدها تفتح تحل إجاباتك وتتصّحح.</p>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- MODAL 1: AI PROMPT GENERATOR ("معندكش ملف؟") -->
     <div id="ai-prompt-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
@@ -643,7 +1194,7 @@ Schema:
   "language": "ar", // Use "ar" for Arabic options (أ، ب، ج، د) or "en" for English/Foreign options (A, B, C, D)
   "questions": [
     {
-      "number": 1,
+      "number": "1", // String: use "1", "2", or for multi-part questions use "5 (1)", "5 (2)", ... so main numbering matches the book!
       "type": "mcq", // "mcq" for multiple choice, "essay" for written/essay questions
       "answer": "أ" // For "mcq": strictly one of "أ", "ب", "ج", "د" (if Arabic) OR "A", "B", "C", "D" (if English). For "essay": the full model answer text.
     }
@@ -651,11 +1202,12 @@ Schema:
 }
 
 Rules:
-1. Preserve exact question numbering from the image.
-2. Normalize Arabic letters strictly to: "أ" (for أ/ا), "ب", "ج", "د".
-3. Normalize English letters strictly to uppercase: "A", "B", "C", "D".
-4. If a question has a written text answer instead of a letter, set "type": "essay" and put the model answer in "answer".
-5. Return ONLY valid JSON.</textarea>
+1. Preserve exact question numbering from the image as strings (e.g. "1", "2").
+2. If a single question has multiple sub-questions/parts (e.g. question 5 has parts 1 to 10 or أ، ب، ج), output each part as its own item with "number": "5 (1)", "5 (2)", etc., then continue with "6" so the numbering stays aligned with the book.
+3. Normalize Arabic letters strictly to: "أ" (for أ/ا), "ب", "ج", "د".
+4. Normalize English letters strictly to uppercase: "A", "B", "C", "D".
+5. If a question has a written text answer instead of a letter, set "type": "essay" and put the model answer in "answer".
+6. Return ONLY valid JSON.</textarea>
             </div>
 
             <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-end gap-2">
@@ -684,7 +1236,6 @@ Rules:
             </div>
 
             <div class="space-y-2.5">
-                <!-- Choice 1: Return to solving -->
                 <button onclick="closeModal('partial-submit-modal')" class="w-full p-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:border-blue-800 dark:hover:border-blue-500 text-right flex items-center justify-between transition-all group">
                     <div>
                         <span class="font-extrabold text-sm sm:text-base block group-hover:text-blue-800 dark:group-hover:text-blue-400">١. لا، رجّعني أكمل</span>
@@ -693,7 +1244,6 @@ Rules:
                     <i class="ph-bold ph-arrow-left text-lg text-slate-400"></i>
                 </button>
 
-                <!-- Choice 2: Partial Submit (Only grade answered) -->
                 <button onclick="finalizeSubmission('partial')" class="w-full p-4 rounded-2xl border-2 border-blue-800/30 bg-blue-50/60 dark:bg-blue-950/30 hover:border-blue-800 text-right flex items-center justify-between transition-all">
                     <div>
                         <span class="font-extrabold text-sm sm:text-base text-blue-950 dark:text-blue-200 block">٢. أنا هسلم دول بس (تسليم جزئي)</span>
@@ -702,7 +1252,6 @@ Rules:
                     <i class="ph-bold ph-check-circle text-xl text-blue-800 dark:text-blue-400 shrink-0"></i>
                 </button>
 
-                <!-- Choice 3: Count unanswered as wrong -->
                 <button onclick="finalizeSubmission('all_wrong')" class="w-full p-4 rounded-2xl border-2 border-rose-200 dark:border-rose-900/50 hover:bg-rose-50/50 dark:hover:bg-rose-950/20 text-right flex items-center justify-between transition-all">
                     <div>
                         <span class="font-extrabold text-sm sm:text-base text-rose-700 dark:text-rose-400 block">٣. أيوه عارف، احسبهم غلط</span>
@@ -728,7 +1277,7 @@ Rules:
             </div>
 
             <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                بياناتك محفوظة محلياً على المتصفح. تقدر تاخد <strong>نسخة احتياطية كاملة</strong> (شاملة كل الواجبات، تقدمك، أرشيف أخطائك، وملاحظاتك) عشان تفتحها على الموبايل أو التابلت أو أي جهاز تاني!
+                بياناتك محفوظة محلياً على المتصفح. تقدر تاخد <strong>نسخة احتياطية كاملة</strong> (شاملة كل الواجبات، تقدمك، أرشيف أخطائك، والصور والملاحظات المرفقة) عشان تفتحها على الموبايل أو التابلت أو أي جهاز تاني!
             </p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -764,6 +1313,257 @@ Rules:
         </div>
     </div>
 
+    <!-- MODAL 5: IMAGE LIGHTBOX PREVIEW -->
+    <div id="image-lightbox-modal" onclick="closeModal('image-lightbox-modal')" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out">
+        <div class="relative max-w-4xl max-h-[90vh]">
+            <button onclick="closeModal('image-lightbox-modal')" class="absolute -top-10 left-0 text-white hover:text-rose-400 flex items-center gap-1 text-sm font-bold">
+                <i class="ph-bold ph-x text-xl"></i> إغلاق
+            </button>
+            <img id="lightbox-img-el" src="" alt="معاينة الصورة" class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain bg-white">
+        </div>
+    </div>
+
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 6: FIRST-TIME USER PROFILE / RESTORE BACKUP ONBOARDING          -->
+    <!-- ===================================================================== -->
+    <div id="user-init-modal" class="fixed inset-0 z-[60] hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-5 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto custom-scroll animate-pop">
+            
+            <!-- Step A: Ask if returning user with backup file or brand new -->
+            <div id="user-init-step-ask" class="text-center space-y-5 py-2">
+                <div class="w-16 h-16 rounded-2xl bg-blue-900 text-white flex items-center justify-center mx-auto shadow-lg">
+                    <i class="ph-bold ph-user-focus text-3xl"></i>
+                </div>
+                <div class="space-y-1.5">
+                    <h2 class="text-xl sm:text-2xl font-black">أهلاً بيك! شكلك داخل من جهاز جديد 👋</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                        ملقيناش ملف بياناتك متسجل على المتصفح ده. هل دخلت الموقع قبل كدة ومعاك ملف احتياطي؟
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3 pt-1">
+                    <button type="button" onclick="showUserInitStep('restore')" class="p-4 rounded-2xl border-2 border-emerald-600 bg-emerald-50/70 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-right flex items-center justify-between transition-all">
+                        <div>
+                            <span class="font-black text-sm sm:text-base text-emerald-900 dark:text-emerald-200 block">أيوه، دخلت قبل كدة ومعايا ملف احتياطي 📂</span>
+                            <span class="text-xs text-slate-600 dark:text-slate-400">ارفع ملفك عشان نرجّع كل نماذجك وأخطائك واسمك فوراً</span>
+                        </div>
+                        <i class="ph-bold ph-arrow-left text-xl text-emerald-700 dark:text-emerald-400 shrink-0"></i>
+                    </button>
+
+                    <button type="button" onclick="showUserInitStep('new')" class="p-4 rounded-2xl border-2 border-blue-800 bg-blue-50/70 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-right flex items-center justify-between transition-all">
+                        <div>
+                            <span class="font-black text-sm sm:text-base text-blue-950 dark:text-blue-200 block">لأ، دي أول مرة أدخل الموقع ✨</span>
+                            <span class="text-xs text-slate-600 dark:text-slate-400">اعمل ملف جديد باسمك ولونك المفضل في ثواني</span>
+                        </div>
+                        <i class="ph-bold ph-arrow-left text-xl text-blue-800 dark:text-blue-400 shrink-0"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step B: Restore Backup File -->
+            <div id="user-init-step-restore" class="hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <button type="button" onclick="showUserInitStep('ask')" class="text-xs font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1">
+                        <i class="ph-bold ph-arrow-right"></i> رجوع
+                    </button>
+                    <span class="text-xs font-extrabold text-emerald-700 dark:text-emerald-400">استعادة ملفك الاحتياطي</span>
+                </div>
+
+                <label class="cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-emerald-500 rounded-2xl p-7 bg-emerald-50/40 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all text-center">
+                    <input type="file" accept=".json,application/json" class="hidden" onchange="handleInitialBackupRestore(event)">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mb-3 shadow-md">
+                        <i class="ph-bold ph-upload-simple text-2xl"></i>
+                    </div>
+                    <span class="font-black text-sm sm:text-base">اضغط هنا لاختيار ملفك الاحتياطي (.json)</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">هيتم استعادة اسمك وثيمك وكل الواجبات والأخطاء تلقائياً</span>
+                </label>
+            </div>
+
+            <!-- Step C: Create New Profile (Name, Gender, Theme Color) -->
+            <form id="user-init-step-new" onsubmit="saveNewUserProfile(event)" class="hidden space-y-4">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <button type="button" onclick="showUserInitStep('ask')" class="text-xs font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1">
+                        <i class="ph-bold ph-arrow-right"></i> رجوع
+                    </button>
+                    <h3 class="font-black text-base">تجهيز ملفك الشخصي</h3>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-extrabold mb-1.5 text-slate-700 dark:text-slate-300">اسمك إيه؟ *</label>
+                    <input type="text" id="init-user-name" required placeholder="اكتب اسمك هنا..." class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold focus:outline-none focus:border-blue-800">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-extrabold mb-1.5 text-slate-700 dark:text-slate-300">النوع *</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="init-gender" value="male" required class="peer hidden" onchange="suggestThemeByGender('male')">
+                            <div class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-blue-800 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-950/50 text-center font-extrabold text-sm transition-all">
+                                ذكر 👦
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="init-gender" value="female" required class="peer hidden" onchange="suggestThemeByGender('female')">
+                            <div class="p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-pink-600 peer-checked:bg-pink-50 dark:peer-checked:bg-pink-950/50 text-center font-extrabold text-sm transition-all">
+                                أنثى 👧
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-extrabold mb-2 text-slate-700 dark:text-slate-300">اختار ثيم اللون اللي تحبه للموقع 🎨</label>
+                    <div class="grid grid-cols-5 gap-2" id="init-theme-picker">
+                        <button type="button" onclick="selectInitColorTheme('blue')" data-tval="blue" class="init-theme-btn p-2.5 rounded-xl border-2 border-blue-900 bg-blue-50 dark:bg-blue-950/50 flex flex-col items-center gap-1.5 transition-all">
+                            <span class="w-6 h-6 rounded-full bg-[#1e3a8a] shadow-sm"></span>
+                            <span class="text-[11px] font-extrabold">أزرق</span>
+                        </button>
+                        <button type="button" onclick="selectInitColorTheme('pink')" data-tval="pink" class="init-theme-btn p-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center gap-1.5 transition-all">
+                            <span class="w-6 h-6 rounded-full bg-[#db2777] shadow-sm"></span>
+                            <span class="text-[11px] font-extrabold">بينك</span>
+                        </button>
+                        <button type="button" onclick="selectInitColorTheme('green')" data-tval="green" class="init-theme-btn p-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center gap-1.5 transition-all">
+                            <span class="w-6 h-6 rounded-full bg-[#059669] shadow-sm"></span>
+                            <span class="text-[11px] font-extrabold">أخضر</span>
+                        </button>
+                        <button type="button" onclick="selectInitColorTheme('red')" data-tval="red" class="init-theme-btn p-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center gap-1.5 transition-all">
+                            <span class="w-6 h-6 rounded-full bg-[#dc2626] shadow-sm"></span>
+                            <span class="text-[11px] font-extrabold">أحمر</span>
+                        </button>
+                        <button type="button" onclick="selectInitColorTheme('purple')" data-tval="purple" class="init-theme-btn p-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center gap-1.5 transition-all">
+                            <span class="w-6 h-6 rounded-full bg-[#7c3aed] shadow-sm"></span>
+                            <span class="text-[11px] font-extrabold">بنفسجي</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-2xl bg-blue-900 hover:bg-blue-800 text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95">
+                    <span>حفظ وبدء الاستخدام</span>
+                    <i class="ph-bold ph-check-circle text-lg"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 7: PROFILE, THEME SWITCHER & BACKUP FILE DOWNLOAD               -->
+    <!-- ===================================================================== -->
+    <div id="profile-settings-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <h3 class="font-extrabold text-lg flex items-center gap-2">
+                    <i class="ph-bold ph-user-circle text-blue-900 dark:text-blue-400 text-2xl"></i>
+                    ملفي الشخصي والثيمات
+                </h3>
+                <button onclick="closeModal('profile-settings-modal')" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="updateExistingUserProfile(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-slate-600 dark:text-slate-400">الاسم</label>
+                    <input type="text" id="edit-user-name" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-slate-600 dark:text-slate-400">النوع</label>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="edit-gender" value="male" class="peer hidden">
+                            <div class="p-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-blue-800 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-950/50 text-center font-bold text-xs">
+                                ذكر 👦
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="edit-gender" value="female" class="peer hidden">
+                            <div class="p-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 peer-checked:border-pink-600 peer-checked:bg-pink-50 dark:peer-checked:bg-pink-950/50 text-center font-bold text-xs">
+                                أنثى 👧
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold mb-2 text-slate-600 dark:text-slate-400">لون الموقع (يشتغل مع الليلي والنهاري)</label>
+                    <div class="grid grid-cols-5 gap-2">
+                        <button type="button" onclick="applyColorTheme('blue', true)" data-edit-tval="blue" class="edit-theme-btn p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center gap-1">
+                            <span class="w-6 h-6 rounded-full bg-[#1e3a8a]"></span>
+                            <span class="text-[11px] font-bold">أزرق</span>
+                        </button>
+                        <button type="button" onclick="applyColorTheme('pink', true)" data-edit-tval="pink" class="edit-theme-btn p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center gap-1">
+                            <span class="w-6 h-6 rounded-full bg-[#db2777]"></span>
+                            <span class="text-[11px] font-bold">بينك</span>
+                        </button>
+                        <button type="button" onclick="applyColorTheme('green', true)" data-edit-tval="green" class="edit-theme-btn p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center gap-1">
+                            <span class="w-6 h-6 rounded-full bg-[#059669]"></span>
+                            <span class="text-[11px] font-bold">أخضر</span>
+                        </button>
+                        <button type="button" onclick="applyColorTheme('red', true)" data-edit-tval="red" class="edit-theme-btn p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center gap-1">
+                            <span class="w-6 h-6 rounded-full bg-[#dc2626]"></span>
+                            <span class="text-[11px] font-bold">أحمر</span>
+                        </button>
+                        <button type="button" onclick="applyColorTheme('purple', true)" data-edit-tval="purple" class="edit-theme-btn p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center gap-1">
+                            <span class="w-6 h-6 rounded-full bg-[#7c3aed]"></span>
+                            <span class="text-[11px] font-bold">بنفسجي</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex items-center justify-between gap-2">
+                    <button type="button" onclick="exportFullBackup()" class="px-3.5 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-extrabold flex items-center gap-1.5">
+                        <i class="ph-bold ph-download-simple text-base"></i>
+                        <span>تحميل ملفي الاحتياطي</span>
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white text-xs font-extrabold">
+                        حفظ التعديلات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 8: SPLIT QUESTION INTO SUB-QUESTIONS ("فرّع السؤال لمطاليب")   -->
+    <!-- ===================================================================== -->
+    <div id="subquestions-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4 animate-pop">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center">
+                        <i class="ph-bold ph-git-fork text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-base sm:text-lg">تفريع <span id="subq-target-label" class="text-indigo-700 dark:text-indigo-400">سؤال 1</span> لمطاليب</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">عشان ترتيب باقي أسئلة الكتاب يفضل مظبوط 100%</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('subquestions-modal')" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="applySubQuestionsSplit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-extrabold mb-1.5 text-slate-700 dark:text-slate-300">السؤال ده جواه كام مطلوب (نقطة)؟ *</label>
+                    <input type="number" id="subq-count-input" min="2" max="50" value="2" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-base font-black focus:outline-none focus:border-indigo-700">
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
+                        مثال: لو كتبت <strong>10</strong> عند سؤال <strong>14</strong>، هيتحول لـ <strong>14 (1)</strong> لحد <strong>14 (10)</strong>، وسؤال <strong>15</strong> هيفضل رقمه 15 زي الكتاب!
+                    </p>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('subquestions-modal')" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800">إلغاء</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl text-xs font-extrabold bg-indigo-700 hover:bg-indigo-600 text-white shadow-md flex items-center gap-1.5">
+                        <i class="ph-bold ph-check"></i>
+                        <span>تأكيد التفريع</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- TOAST NOTIFICATION CONTAINER -->
     <div id="toast-container" class="fixed bottom-5 left-5 right-5 sm:left-auto sm:right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -776,8 +1576,13 @@ Rules:
         // =========================================================================
         const STORAGE_KEY = 'smart_bubble_sheet_v1';
         const THEME_KEY = 'smart_bubble_sheet_theme';
+        const TUTORIAL_DISMISSED_KEY = 'smart_bubble_sheet_tutorial_done';
+
+        const COLOR_THEME_KEY = 'smart_bubble_sheet_color_theme';
+        let selectedInitTheme = 'blue';
 
         let appState = {
+            userProfile: null, // { name, gender, colorTheme, createdAt }
             homeworks: [], // Array of Homework Objects
             solveMode: 'standard', // 'standard' or 'auto'
         };
@@ -789,7 +1594,7 @@ Rules:
         let currentQuestionIndex = 0;
         let hasUnsavedChanges = false;
         let dashboardFilter = 'all';
-        let isRetrySession = false; // True when user clicks "اختبرني في غلطاتي"
+        let isRetrySession = false;
 
         const ERROR_REASONS = [
             'عوضت غلط',
@@ -798,9 +1603,11 @@ Rules:
             'متلخبط / ناسي قاعدة'
         ];
 
-        // Load saved state on startup
         function initApp() {
             initTheme();
+            generateHomeScreenAppIcon();
+
+            let hasSavedStorage = false;
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
                 if (raw) {
@@ -808,24 +1615,296 @@ Rules:
                     if (parsed && Array.isArray(parsed.homeworks)) {
                         appState.homeworks = parsed.homeworks;
                         appState.solveMode = parsed.solveMode || 'standard';
+                        appState.userProfile = parsed.userProfile || null;
+                        hasSavedStorage = true;
                     }
                 }
             } catch (e) {
                 console.error('Error loading localStorage:', e);
             }
 
+            const savedColor = (appState.userProfile && appState.userProfile.colorTheme)
+                || localStorage.getItem(COLOR_THEME_KEY)
+                || 'blue';
+            applyColorTheme(savedColor, false);
+
             setupDragAndDrop();
             setupKeyboardShortcuts();
             setupBeforeUnloadGuard();
             refreshAllUI();
+            applyUserPersonalization();
+
+            // Check if user profile exists on this device; if not, show welcome/restore prompt first
+            if (!appState.userProfile) {
+                showUserInitStep('ask');
+                openModal('user-init-modal');
+            } else if (localStorage.getItem(TUTORIAL_DISMISSED_KEY) !== 'true') {
+                openTutorialFromStart();
+            }
+        }
+
+        // Generate crisp PNG icon dynamically for mobile Home Screen shortcut (apple-touch-icon)
+        function generateHomeScreenAppIcon() {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 180;
+                canvas.height = 180;
+                const ctx = canvas.getContext('2d');
+
+                // Rounded background gradient
+                const grad = ctx.createLinearGradient(0, 0, 180, 180);
+                grad.addColorStop(0, '#1e3a8a');
+                grad.addColorStop(1, '#3b82f6');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.roundRect(0, 0, 180, 180, 40);
+                ctx.fill();
+
+                // Draw two checked bubble boxes + lines
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 9;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                // Box 1
+                ctx.strokeRect(38, 44, 38, 38);
+                ctx.beginPath();
+                ctx.moveTo(94, 63);
+                ctx.lineTo(142, 63);
+                ctx.stroke();
+
+                // Box 2
+                ctx.strokeRect(38, 98, 38, 38);
+                ctx.beginPath();
+                ctx.moveTo(94, 117);
+                ctx.lineTo(142, 117);
+                ctx.stroke();
+
+                // Emerald checkmarks
+                ctx.strokeStyle = '#34d399';
+                ctx.beginPath();
+                ctx.moveTo(47, 63);
+                ctx.lineTo(55, 71);
+                ctx.lineTo(69, 54);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(47, 117);
+                ctx.lineTo(55, 125);
+                ctx.lineTo(69, 108);
+                ctx.stroke();
+
+                const link = document.getElementById('apple-touch-icon-link');
+                if (link) link.href = canvas.toDataURL('image/png');
+            } catch (e) {}
+        }
+
+        // =========================================================================
+        // 1.2 USER PROFILE, COLOR THEMES & FIRST-TIME ONBOARDING
+        // =========================================================================
+        function applyColorTheme(themeName, saveToProfile = false) {
+            const validThemes = ['blue', 'pink', 'green', 'red', 'purple'];
+            const theme = validThemes.includes(themeName) ? themeName : 'blue';
+            document.documentElement.setAttribute('data-color-theme', theme);
+            localStorage.setItem(COLOR_THEME_KEY, theme);
+
+            const themeHexMap = {
+                blue: '#1e3a8a',
+                pink: '#831843',
+                green: '#064e3b',
+                red: '#7f1d1d',
+                purple: '#4c1d95'
+            };
+            const metaColor = document.getElementById('meta-theme-color');
+            if (metaColor) metaColor.setAttribute('content', themeHexMap[theme]);
+
+            document.querySelectorAll('.edit-theme-btn').forEach(btn => {
+                if (btn.dataset.editTval === theme) {
+                    btn.classList.add('border-slate-900', 'dark:border-white', 'bg-slate-100', 'dark:bg-slate-800');
+                } else {
+                    btn.classList.remove('border-slate-900', 'dark:border-white', 'bg-slate-100', 'dark:bg-slate-800');
+                }
+            });
+
+            if (saveToProfile && appState.userProfile) {
+                appState.userProfile.colorTheme = theme;
+                persistState();
+            }
+        }
+
+        function showUserInitStep(step) {
+            ['ask', 'restore', 'new'].forEach(s => {
+                const el = document.getElementById(`user-init-step-${s}`);
+                if (el) el.classList.toggle('hidden', s !== step);
+            });
+        }
+
+        function suggestThemeByGender(gender) {
+            if (gender === 'female') {
+                selectInitColorTheme('pink');
+            } else {
+                selectInitColorTheme('blue');
+            }
+        }
+
+        function selectInitColorTheme(themeName) {
+            selectedInitTheme = themeName;
+            applyColorTheme(themeName, false);
+            document.querySelectorAll('.init-theme-btn').forEach(btn => {
+                if (btn.dataset.tval === themeName) {
+                    btn.className = 'init-theme-btn p-2.5 rounded-xl border-2 border-blue-900 bg-blue-50 dark:bg-blue-950/50 flex flex-col items-center gap-1.5 transition-all scale-105';
+                } else {
+                    btn.className = 'init-theme-btn p-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center gap-1.5 transition-all';
+                }
+            });
+        }
+
+        function saveNewUserProfile(e) {
+            e.preventDefault();
+            const name = document.getElementById('init-user-name').value.trim();
+            const genderEl = document.querySelector('input[name="init-gender"]:checked');
+            if (!name || !genderEl) return;
+
+            appState.userProfile = {
+                name,
+                gender: genderEl.value,
+                colorTheme: selectedInitTheme,
+                createdAt: new Date().toISOString()
+            };
+            applyColorTheme(selectedInitTheme, true);
+            persistState();
+            applyUserPersonalization();
+            closeModal('user-init-modal');
+
+            showToast(
+                genderEl.value === 'female'
+                    ? `نورتي الموقع يا ${name}! تم تجهيز ملفك بنجاح.`
+                    : `نورت الموقع يا ${name}! تم تجهيز ملفك بنجاح.`,
+                'success'
+            );
+
+            if (localStorage.getItem(TUTORIAL_DISMISSED_KEY) !== 'true') {
+                openTutorialFromStart();
+            }
+        }
+
+        function handleInitialBackupRestore(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data || !Array.isArray(data.homeworks)) {
+                        throw new Error('Invalid backup file');
+                    }
+                    appState.homeworks = data.homeworks;
+                    appState.solveMode = data.solveMode || 'standard';
+                    appState.userProfile = data.userProfile || {
+                        name: 'بطل المذاكرة',
+                        gender: 'male',
+                        colorTheme: 'blue',
+                        createdAt: new Date().toISOString()
+                    };
+
+                    applyColorTheme(appState.userProfile.colorTheme || 'blue', true);
+                    persistState();
+                    refreshAllUI();
+                    applyUserPersonalization();
+                    closeModal('user-init-modal');
+                    localStorage.setItem(TUTORIAL_DISMISSED_KEY, 'true');
+
+                    showToast(`أهلاً بعودتك يا ${appState.userProfile.name}! تم استرجاع كل بياناتك بنجاح.`, 'success');
+                } catch (err) {
+                    showToast('الملف ده مش ملف نسخة احتياطية سليم! تأكد من اختيار الملف الصح.', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function applyUserPersonalization() {
+            const profile = appState.userProfile;
+            const nameEl = document.getElementById('header-user-name');
+            const headingEl = document.getElementById('home-welcome-heading');
+            if (!profile) return;
+
+            if (nameEl) nameEl.textContent = profile.name;
+            if (headingEl) {
+                const greeting = profile.gender === 'female'
+                    ? `أهلاً بيكي يا ${profile.name} 👋 ابدئي بابل شيت جديد`
+                    : `أهلاً بيك يا ${profile.name} 👋 ابدأ بابل شيت جديد`;
+                headingEl.textContent = greeting;
+            }
+        }
+
+        function openProfileSettingsModal() {
+            const profile = appState.userProfile || { name: '', gender: 'male', colorTheme: 'blue' };
+            document.getElementById('edit-user-name').value = profile.name || '';
+            const genderRadio = document.querySelector(`input[name="edit-gender"][value="${profile.gender || 'male'}"]`);
+            if (genderRadio) genderRadio.checked = true;
+            applyColorTheme(profile.colorTheme || 'blue', false);
+            openModal('profile-settings-modal');
+        }
+
+        function updateExistingUserProfile(e) {
+            e.preventDefault();
+            const name = document.getElementById('edit-user-name').value.trim();
+            const genderEl = document.querySelector('input[name="edit-gender"]:checked');
+            const currentTheme = localStorage.getItem(COLOR_THEME_KEY) || 'blue';
+            if (!name) return;
+
+            appState.userProfile = {
+                ...(appState.userProfile || {}),
+                name,
+                gender: genderEl ? genderEl.value : 'male',
+                colorTheme: currentTheme
+            };
+            persistState();
+            applyUserPersonalization();
+            closeModal('profile-settings-modal');
+            showToast('تم حفظ بياناتك وتحديث الثيم بنجاح!', 'success');
         }
 
         function persistState() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
             } catch (e) {
-                showToast('حدث خطأ أثناء الحفظ في ذاكرة المتصفح!', 'error');
+                showToast('ذاكرة المتصفح ممتلئة! حاول تصدير نسخة احتياطية أو تقليل حجم الصور المرفقة.', 'error');
             }
+        }
+
+        // =========================================================================
+        // 1.5 FIRST-TIME WELCOME & INTERACTIVE GRAPHIC TUTORIAL
+        // =========================================================================
+        function openTutorialFromStart() {
+            goToTutorialStep(0);
+            openModal('onboarding-modal');
+        }
+
+        function goToTutorialStep(stepIndex) {
+            [0, 1, 2, 3].forEach(idx => {
+                const el = document.getElementById(`tut-step-${idx}`);
+                if (el) el.classList.toggle('hidden', idx !== stepIndex);
+            });
+            if (stepIndex === 1) {
+                replayTutorialAnimation(1);
+            }
+        }
+
+        function replayTutorialAnimation(step) {
+            if (step === 1) {
+                const stage = document.getElementById('tut-anim-stage-1');
+                if (!stage) return;
+                const clone = stage.cloneNode(true);
+                stage.parentNode.replaceChild(clone, stage);
+            }
+        }
+
+        function dismissTutorialForever() {
+            localStorage.setItem(TUTORIAL_DISMISSED_KEY, 'true');
+            closeModal('onboarding-modal');
         }
 
         // =========================================================================
@@ -860,7 +1939,6 @@ Rules:
         // 3. NAVIGATION & VIEW ROUTER
         // =========================================================================
         function navigateTo(viewName) {
-            // If leaving solve view with unsaved changes, prompt user
             if (!document.getElementById('view-solve').classList.contains('hidden') && viewName !== 'solve' && hasUnsavedChanges) {
                 openModal('unsaved-modal');
                 return;
@@ -871,7 +1949,6 @@ Rules:
             });
             document.getElementById(`view-${viewName}`).classList.remove('hidden');
 
-            // Update active nav styling
             const homeBtn = document.getElementById('nav-home-btn');
             const mistakesBtn = document.getElementById('nav-mistakes-btn');
             if (viewName === 'home') {
@@ -897,7 +1974,6 @@ Rules:
         function confirmDiscardAndExit() {
             hasUnsavedChanges = false;
             closeModal('unsaved-modal');
-            // Reload state from localStorage to discard unsaved memory edits
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) appState = JSON.parse(raw);
             navigateTo('home');
@@ -919,7 +1995,7 @@ Rules:
         }
 
         // =========================================================================
-        // 4. ANSWER KEY UPLOAD, AI PROMPT & DEMO HOMEWORK
+        // 4. ANSWER KEY UPLOAD, MANUAL CREATION & DEMO HOMEWORK
         // =========================================================================
         function setupDragAndDrop() {
             const dropZone = document.getElementById('drop-zone');
@@ -948,7 +2024,7 @@ Rules:
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (file) processAnswerKeyFile(file);
-            event.target.value = ''; // Reset input
+            event.target.value = '';
         }
 
         function processAnswerKeyFile(file) {
@@ -956,7 +2032,6 @@ Rules:
             reader.onload = (e) => {
                 try {
                     let content = e.target.result.trim();
-                    // Strip markdown code fences if user pasted raw AI output into a file
                     content = content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
                     const data = JSON.parse(content);
 
@@ -964,7 +2039,6 @@ Rules:
                         throw new Error('ملف الإجابات لا يحتوي على قائمة أسئلة صحيحة.');
                     }
 
-                    // Normalize questions
                     const normalizedQuestions = data.questions.map((q, idx) => {
                         const qType = (q.type === 'essay') ? 'essay' : 'mcq';
                         let ans = String(q.answer || '').trim();
@@ -973,24 +2047,25 @@ Rules:
                             if (['a', 'b', 'c', 'd'].includes(ans.toLowerCase())) ans = ans.toUpperCase();
                         }
                         return {
-                            number: q.number || (idx + 1),
+                            number: (q.number !== undefined && q.number !== null && String(q.number).trim() !== '') ? String(q.number).trim() : String(idx + 1),
                             type: qType,
                             correctAnswer: ans,
                             userAnswer: null,
                             essayRevealed: false,
-                            essayScore: null, // 0, 0.5, 1, 1.5, 2
+                            essayScore: null,
                             flagged: false,
-                            status: 'unanswered', // 'unanswered' | 'correct' | 'wrong' | 'partial' | 'skipped_unrevealed'
+                            status: 'unanswered',
                             errorReason: '',
                             understood: false,
-                            note: ''
+                            note: '',
+                            questionText: '',
+                            questionImage: ''
                         };
                     });
 
                     pendingParsedQuestions = normalizedQuestions;
                     pendingParsedLang = (data.language === 'en') ? 'en' : 'ar';
 
-                    // Populate subjects datalist
                     populateSubjectsDatalist();
 
                     document.getElementById('parsed-q-count').textContent = normalizedQuestions.length;
@@ -1028,7 +2103,10 @@ Rules:
                 lesson,
                 language,
                 createdAt: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' }),
-                status: 'in_progress', // 'in_progress' | 'partial' | 'completed'
+                status: 'in_progress',
+                isManual: false,
+                manualPhase: null,
+                manualOrder: null,
                 questions: pendingParsedQuestions,
                 scoreEarned: 0,
                 scoreMax: 0,
@@ -1038,12 +2116,79 @@ Rules:
             appState.homeworks.unshift(newHw);
             persistState();
 
-            // Clear form
             document.getElementById('homework-metadata-form').reset();
             document.getElementById('metadata-setup-card').classList.add('hidden');
             pendingParsedQuestions = null;
 
             openSolveView(newHw.id);
+        }
+
+        // Manual Homework Setup & Two-Phase Logic
+        function openManualSetupModal() {
+            populateSubjectsDatalist();
+            openModal('manual-setup-modal');
+        }
+
+        function startManualHomework(startOrder) {
+            const subject = document.getElementById('man-subject').value.trim();
+            const book = document.getElementById('man-book').value.trim();
+            const chapter = document.getElementById('man-chapter').value.trim();
+            const lesson = document.getElementById('man-lesson').value.trim();
+            const qCount = parseInt(document.getElementById('man-qcount').value, 10);
+            const language = document.getElementById('man-lang').value;
+
+            if (!subject || !book || !chapter || !lesson || !qCount || qCount < 1) {
+                showToast('من فضلك املا كل البيانات وعدد الأسئلة الأول!', 'error');
+                return;
+            }
+
+            const questions = Array.from({ length: qCount }, (_, i) => ({
+                number: i + 1,
+                type: 'mcq',
+                correctAnswer: null, // Will be filled in 'key' phase
+                userAnswer: null,    // Will be filled in 'user' phase
+                essayRevealed: false,
+                essayScore: null,
+                flagged: false,
+                status: 'unanswered',
+                errorReason: '',
+                understood: false,
+                note: '',
+                questionText: '',
+                questionImage: ''
+            }));
+
+            const newHw = {
+                id: 'hw_man_' + Date.now(),
+                subject,
+                book,
+                chapter,
+                lesson,
+                language,
+                createdAt: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' }),
+                status: 'in_progress',
+                isManual: true,
+                manualOrder: startOrder, // 'user_first' or 'key_first'
+                manualPhase: startOrder === 'user_first' ? 'user' : 'key', // 'user' | 'key'
+                questions,
+                scoreEarned: 0,
+                scoreMax: 0,
+                percentage: 0
+            };
+
+            appState.homeworks.unshift(newHw);
+            persistState();
+
+            document.getElementById('manual-homework-form').reset();
+            closeModal('manual-setup-modal');
+
+            openSolveView(newHw.id);
+            showToast(
+                startOrder === 'user_first'
+                    ? 'المرحلة ١: حل إجاباتك دلوقتي، وبعدها هندخّل نموذج الإجابة!'
+                    : 'المرحلة ١: سجّل الإجابات الصح من النموذج الأول!',
+                'info'
+            );
         }
 
         function loadDemoHomework() {
@@ -1067,7 +2212,9 @@ Rules:
                 status: 'unanswered',
                 errorReason: '',
                 understood: false,
-                note: ''
+                note: '',
+                questionText: '',
+                questionImage: ''
             }));
 
             const demoHw = {
@@ -1079,6 +2226,9 @@ Rules:
                 language: 'ar',
                 createdAt: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' }),
                 status: 'in_progress',
+                isManual: false,
+                manualPhase: null,
+                manualOrder: null,
                 questions: demoQuestions,
                 scoreEarned: 0,
                 scoreMax: 0,
@@ -1109,7 +2259,7 @@ Rules:
         }
 
         // =========================================================================
-        // 5. SMART BUBBLE SHEET SOLVING ENGINE
+        // 5. SMART BUBBLE SHEET SOLVING ENGINE (NORMAL + MANUAL TWO-PHASE)
         // =========================================================================
         function openSolveView(hwId, isRetry = false) {
             const hw = appState.homeworks.find(h => h.id === hwId);
@@ -1119,18 +2269,141 @@ Rules:
             isRetrySession = isRetry;
             hasUnsavedChanges = false;
 
-            // Find first unanswered question to start from, or index 0
-            const firstUnanswered = hw.questions.findIndex(q => !isQuestionAnswered(q));
+            const firstUnanswered = hw.questions.findIndex(q => !isQuestionAnsweredInCurrentPhase(hw, q));
             currentQuestionIndex = firstUnanswered !== -1 ? firstUnanswered : 0;
 
-            // Header Details
             document.getElementById('solve-subject-badge').textContent = hw.subject;
             document.getElementById('solve-title').textContent = `${hw.book} • ${hw.chapter} • ${hw.lesson}`;
 
             updateSolveModeUI();
+            updateManualPhaseBannerUI(hw);
             renderCurrentQuestion();
             renderQuestionMap();
             navigateTo('solve');
+        }
+
+        function isEnteringKeyPhase(hw) {
+            return hw && hw.isManual && hw.manualPhase === 'key';
+        }
+
+        function isQuestionAnsweredInCurrentPhase(hw, q) {
+            if (isEnteringKeyPhase(hw)) {
+                return q.correctAnswer !== null && q.correctAnswer !== '';
+            }
+            if (q.type === 'mcq') return q.userAnswer !== null && q.userAnswer !== '';
+            if (q.type === 'essay') return q.essayScore !== null;
+            return false;
+        }
+
+        function updateManualPhaseBannerUI(hw) {
+            const banner = document.getElementById('manual-phase-banner');
+            const submitBtnText = document.getElementById('main-submit-btn-text');
+            const submitBtn = document.getElementById('main-submit-btn');
+            const legendDot = document.getElementById('legend-answered-dot');
+            const legendLabel = document.getElementById('legend-answered-label');
+
+            if (!hw || !hw.isManual) {
+                banner.classList.add('hidden');
+                submitBtnText.textContent = 'تسليم الواجب';
+                submitBtn.className = 'px-5 sm:px-7 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm sm:text-base shadow-md flex items-center gap-2 transition-all active:scale-95';
+                legendDot.className = 'w-3 h-3 rounded bg-blue-900 inline-block';
+                legendLabel.textContent = 'متجاوب';
+                return;
+            }
+
+            banner.classList.remove('hidden');
+            const isPhase1 = (hw.manualOrder === 'user_first' && hw.manualPhase === 'user')
+                          || (hw.manualOrder === 'key_first' && hw.manualPhase === 'key');
+
+            const stepBadge = document.getElementById('manual-phase-step-badge');
+            const titleEl = document.getElementById('manual-phase-title');
+            const descEl = document.getElementById('manual-phase-desc');
+            const switchBtn = document.getElementById('manual-phase-switch-btn');
+            const iconWrap = document.getElementById('manual-phase-icon');
+
+            if (isEnteringKeyPhase(hw)) {
+                // Entering Model Answer Key
+                banner.className = 'rounded-2xl p-3.5 sm:p-4 border-2 border-emerald-500 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-100 flex flex-wrap items-center justify-between gap-3 animate-pop';
+                iconWrap.className = 'w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0';
+                iconWrap.innerHTML = '<i class="ph-bold ph-check-circle text-xl"></i>';
+                stepBadge.className = 'text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-200 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-200';
+                stepBadge.textContent = isPhase1 ? 'المرحلة ١ من ٢ • إدخال النموذج' : 'المرحلة ٢ من ٢ • إدخال النموذج';
+                titleEl.textContent = 'حط إجابات النموذج الصح دلوقتي ✅';
+                descEl.textContent = isPhase1
+                    ? 'سجّل الإجابات الصحيحة من النموذج اللي معاك، وبعد ما تخلص اضغط "ابدأ حل إجاباتي".'
+                    : 'سجّل الإجابات الصحيحة من النموذج عشان نصحح إجاباتك فوراً ونطلع النتيجة!';
+
+                if (isPhase1) {
+                    switchBtn.className = 'px-4 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-extrabold text-xs sm:text-sm shadow-sm flex items-center gap-1.5';
+                    switchBtn.innerHTML = '<span>خلصت النموذج، ابدأ حل إجاباتي</span><i class="ph-bold ph-arrow-left"></i>';
+                    submitBtnText.textContent = 'الانتقال لحل إجاباتي';
+                    submitBtn.className = 'px-5 sm:px-7 py-3.5 rounded-2xl bg-blue-900 hover:bg-blue-800 text-white font-extrabold text-sm sm:text-base shadow-md flex items-center gap-2 transition-all active:scale-95';
+                } else {
+                    switchBtn.className = 'px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm shadow-sm flex items-center gap-1.5';
+                    switchBtn.innerHTML = '<span>احسب النتيجة وصحّح الآن</span><i class="ph-bold ph-check"></i>';
+                    submitBtnText.textContent = 'تصحيح وعرض النتيجة';
+                    submitBtn.className = 'px-5 sm:px-7 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm sm:text-base shadow-md flex items-center gap-2 transition-all active:scale-95';
+                }
+                legendDot.className = 'w-3 h-3 rounded bg-emerald-600 inline-block';
+                legendLabel.textContent = 'متسجل بالنموذج';
+            } else {
+                // Entering User Answers
+                banner.className = 'rounded-2xl p-3.5 sm:p-4 border-2 border-blue-700 bg-blue-50/80 dark:bg-blue-950/40 text-blue-950 dark:text-blue-100 flex flex-wrap items-center justify-between gap-3 animate-pop';
+                iconWrap.className = 'w-10 h-10 rounded-xl bg-blue-900 text-white flex items-center justify-center shrink-0';
+                iconWrap.innerHTML = '<i class="ph-bold ph-pencil-simple text-xl"></i>';
+                stepBadge.className = 'text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-blue-200 text-blue-900 dark:bg-blue-900 dark:text-blue-200';
+                stepBadge.textContent = isPhase1 ? 'المرحلة ١ من ٢ • إجاباتك' : 'المرحلة ٢ من ٢ • إجاباتك';
+                titleEl.textContent = 'اختار إجاباتك أنت دلوقتي ✍️';
+                descEl.textContent = isPhase1
+                    ? 'اختار إجاباتك لكل سؤال، ولما تخلص اضغط "حط نموذج الإجابة للتصحيح".'
+                    : 'نموذج الإجابة متسجل وجاهز! اختار إجاباتك وبعدين اضغط "تسليم الواجب".';
+
+                if (isPhase1) {
+                    switchBtn.className = 'px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm shadow-sm flex items-center gap-1.5';
+                    switchBtn.innerHTML = '<span>حط نموذج الإجابة للتصحيح</span><i class="ph-bold ph-arrow-left"></i>';
+                    submitBtnText.textContent = 'الانتقال لإدخال النموذج';
+                    submitBtn.className = 'px-5 sm:px-7 py-3.5 rounded-2xl bg-indigo-700 hover:bg-indigo-600 text-white font-extrabold text-sm sm:text-base shadow-md flex items-center gap-2 transition-all active:scale-95';
+                } else {
+                    switchBtn.className = 'px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm shadow-sm flex items-center gap-1.5';
+                    switchBtn.innerHTML = '<span>تسليم وتصحيح الواجب</span><i class="ph-bold ph-paper-plane-tilt"></i>';
+                    submitBtnText.textContent = 'تسليم الواجب';
+                    submitBtn.className = 'px-5 sm:px-7 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm sm:text-base shadow-md flex items-center gap-2 transition-all active:scale-95';
+                }
+                legendDot.className = 'w-3 h-3 rounded bg-blue-900 inline-block';
+                legendLabel.textContent = 'متجاوب';
+            }
+        }
+
+        function handleManualPhaseAction() {
+            const hw = appState.homeworks.find(h => h.id === currentHomeworkId);
+            if (!hw || !hw.isManual) return;
+
+            const isPhase1 = (hw.manualOrder === 'user_first' && hw.manualPhase === 'user')
+                          || (hw.manualOrder === 'key_first' && hw.manualPhase === 'key');
+
+            if (isPhase1) {
+                switchToSecondManualPhase(hw);
+            } else {
+                initiateSubmitHomework();
+            }
+        }
+
+        function switchToSecondManualPhase(hw) {
+            hw.manualPhase = (hw.manualPhase === 'user') ? 'key' : 'user';
+            currentQuestionIndex = 0;
+            hasUnsavedChanges = true;
+            persistState();
+
+            updateManualPhaseBannerUI(hw);
+            renderCurrentQuestion();
+            renderQuestionMap();
+
+            showToast(
+                hw.manualPhase === 'key'
+                    ? 'المرحلة ٢: حط بقى إجابات النموذج الصح بنفسك!'
+                    : 'المرحلة ٢: اختار إجاباتك أنت دلوقتي!',
+                'success'
+            );
         }
 
         function setSolveMode(mode) {
@@ -1152,28 +2425,53 @@ Rules:
             }
         }
 
-        function isQuestionAnswered(q) {
-            if (q.type === 'mcq') return q.userAnswer !== null && q.userAnswer !== '';
-            if (q.type === 'essay') return q.essayScore !== null;
-            return false;
-        }
-
         function renderCurrentQuestion() {
             const hw = appState.homeworks.find(h => h.id === currentHomeworkId);
             if (!hw) return;
 
             const q = hw.questions[currentQuestionIndex];
             const total = hw.questions.length;
+            const keyMode = isEnteringKeyPhase(hw);
 
-            // Update Progress Text
-            const answeredCount = hw.questions.filter(isQuestionAnswered).length;
-            document.getElementById('solve-progress-text').textContent = `تم حل ${answeredCount} من ${total} سؤال`;
+            const answeredCount = hw.questions.filter(item => isQuestionAnsweredInCurrentPhase(hw, item)).length;
+            document.getElementById('solve-progress-text').textContent = keyMode
+                ? `تم تسجيل ${answeredCount} من ${total} إجابة في النموذج`
+                : `تم حل ${answeredCount} من ${total} سؤال`;
             document.getElementById('map-answered-ratio').textContent = `${answeredCount} / ${total}`;
 
-            // Question Header
-            document.getElementById('q-number-display').textContent = `سؤال ${q.number}`;
-            document.getElementById('q-total-display').textContent = `من ${total}`;
-            document.getElementById('q-type-badge').textContent = q.type === 'mcq' ? 'اختيار من متعدد' : 'سؤال مقالي (تقييم ذاتي)';
+            document.getElementById('q-number-display').textContent = formatQuestionLabel(q.number);
+            document.getElementById('q-total-display').textContent = `(عنصر ${currentQuestionIndex + 1} من ${total})`;
+            const splitBtn = document.getElementById('split-subq-btn');
+            if (splitBtn) splitBtn.classList.toggle('hidden', isRetrySession);
+            document.getElementById('q-type-badge').textContent = keyMode
+                ? 'إدخال إجابة النموذج'
+                : (q.type === 'mcq' ? 'اختيار من متعدد' : 'سؤال مقالي (تقييم ذاتي)');
+
+            // Show saved Question Text / Image if present (especially in Retry Mistakes!)
+            const attachBox = document.getElementById('retry-attachment-box');
+            const qTextEl = document.getElementById('retry-q-text');
+            const qImgWrap = document.getElementById('retry-q-img-wrap');
+            const qImgEl = document.getElementById('retry-q-img');
+            const originMetaEl = document.getElementById('retry-origin-meta');
+
+            if (q.questionText || q.questionImage || q.originLabel) {
+                attachBox.classList.remove('hidden');
+                originMetaEl.textContent = q.originLabel || '';
+                if (q.questionText) {
+                    qTextEl.textContent = q.questionText;
+                    qTextEl.classList.remove('hidden');
+                } else {
+                    qTextEl.classList.add('hidden');
+                }
+                if (q.questionImage) {
+                    qImgEl.src = q.questionImage;
+                    qImgWrap.classList.remove('hidden');
+                } else {
+                    qImgWrap.classList.add('hidden');
+                }
+            } else {
+                attachBox.classList.add('hidden');
+            }
 
             // Flag Button State
             const flagBtn = document.getElementById('flag-q-btn');
@@ -1186,18 +2484,21 @@ Rules:
                 flagIcon.className = 'ph-bold ph-flag text-base';
             }
 
-            // Prev/Next Button States
             document.getElementById('prev-q-btn').disabled = (currentQuestionIndex === 0);
             document.getElementById('next-q-btn').disabled = (currentQuestionIndex === total - 1);
 
-            // Render MCQ vs Essay
             const mcqContainer = document.getElementById('mcq-container');
             const essayContainer = document.getElementById('essay-container');
+            const mcqInst = document.getElementById('mcq-instruction-text');
 
-            if (q.type === 'mcq') {
+            mcqInst.textContent = keyMode
+                ? 'اختر الإجابة الصحيحة الموجودة في نموذج الإجابة (أو بالكيبورد 1-4):'
+                : 'اختر الإجابة الصحيحة من البابل شيت (أو استخدم الكيبورد 1-4):';
+
+            if (q.type === 'mcq' || keyMode) {
                 mcqContainer.classList.remove('hidden');
                 essayContainer.classList.add('hidden');
-                renderMcqOptions(hw, q);
+                renderMcqOptions(hw, q, keyMode);
             } else {
                 mcqContainer.classList.add('hidden');
                 essayContainer.classList.remove('hidden');
@@ -1205,20 +2506,25 @@ Rules:
             }
         }
 
-        function renderMcqOptions(hw, q) {
+        function renderMcqOptions(hw, q, keyMode = false) {
             const grid = document.getElementById('mcq-options-grid');
             const isEnglish = hw.language === 'en';
             const options = isEnglish ? ['A', 'B', 'C', 'D'] : ['أ', 'ب', 'ج', 'د'];
             const labels = isEnglish ? ['Option A', 'Option B', 'Option C', 'Option D'] : ['الاختيار الأول', 'الاختيار الثاني', 'الاختيار الثالث', 'الاختيار الرابع'];
 
+            const currentVal = keyMode ? q.correctAnswer : q.userAnswer;
+
             grid.dir = isEnglish ? 'ltr' : 'rtl';
             grid.innerHTML = options.map((opt, idx) => {
-                const isSelected = (q.userAnswer === opt);
+                const isSelected = (currentVal === opt);
+                const selectedTheme = keyMode
+                    ? 'border-emerald-600 bg-emerald-600 text-white shadow-lg scale-[1.01]'
+                    : 'border-blue-900 bg-blue-900 text-white shadow-lg scale-[1.01]';
                 const baseClasses = isSelected
-                    ? 'border-blue-900 bg-blue-900 text-white shadow-lg scale-[1.01]'
+                    ? selectedTheme
                     : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/50 hover:border-blue-700 dark:hover:border-blue-500 text-slate-800 dark:text-slate-100';
                 const circleClasses = isSelected
-                    ? 'bg-white text-blue-900 font-black'
+                    ? (keyMode ? 'bg-white text-emerald-700 font-black' : 'bg-white text-blue-900 font-black')
                     : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 font-extrabold';
 
                 return `
@@ -1228,9 +2534,9 @@ Rules:
                         </span>
                         <div class="flex-1">
                             <span class="font-extrabold text-base sm:text-lg block ${isEnglish ? 'font-en' : ''}">${opt}</span>
-                            <span class="text-xs ${isSelected ? 'text-blue-200' : 'text-slate-400'}">${labels[idx]}</span>
+                            <span class="text-xs ${isSelected ? 'text-white/80' : 'text-slate-400'}">${labels[idx]}</span>
                         </div>
-                        ${isSelected ? '<i class="ph-fill ph-check-circle text-2xl text-emerald-300"></i>' : ''}
+                        ${isSelected ? '<i class="ph-fill ph-check-circle text-2xl text-white"></i>' : ''}
                     </button>
                 `;
             }).join('');
@@ -1241,19 +2547,40 @@ Rules:
             if (!hw) return;
 
             const q = hw.questions[currentQuestionIndex];
-            q.userAnswer = option;
+            const keyMode = isEnteringKeyPhase(hw);
+
+            if (keyMode) {
+                q.correctAnswer = option;
+            } else {
+                q.userAnswer = option;
+            }
             hasUnsavedChanges = true;
 
             renderCurrentQuestion();
             renderQuestionMap();
 
+            const isLastQuestion = (currentQuestionIndex === hw.questions.length - 1);
+
             // Auto-Next Mode logic
-            if (appState.solveMode === 'auto' && currentQuestionIndex < hw.questions.length - 1) {
+            if (appState.solveMode === 'auto' && !isLastQuestion) {
                 setTimeout(() => {
                     currentQuestionIndex++;
                     renderCurrentQuestion();
                     renderQuestionMap();
                 }, 180);
+            } else if (isLastQuestion && hw.isManual) {
+                const isPhase1 = (hw.manualOrder === 'user_first' && hw.manualPhase === 'user')
+                              || (hw.manualOrder === 'key_first' && hw.manualPhase === 'key');
+                if (isPhase1) {
+                    setTimeout(() => {
+                        showToast(
+                            hw.manualPhase === 'user'
+                                ? 'وصلت لآخر سؤال! اضغط "حط نموذج الإجابة للتصحيح" فوق أو تحت.'
+                                : 'سجّلت آخر سؤال في النموذج! اضغط "ابدأ حل إجاباتي" للتصحيح.',
+                            'info'
+                        );
+                    }, 220);
+                }
             }
         }
 
@@ -1274,7 +2601,6 @@ Rules:
                 gradingBox.classList.add('hidden');
             }
 
-            // Highlight selected score button
             document.querySelectorAll('.essay-score-btn').forEach(btn => {
                 const sc = parseFloat(btn.dataset.score);
                 if (q.essayScore === sc) {
@@ -1302,16 +2628,114 @@ Rules:
             renderQuestionMap();
         }
 
+        function formatQuestionLabel(numVal) {
+            const s = String(numVal ?? '').trim();
+            const match = s.match(/^([^(\s]+)\s*\(([^)]+)\)$/);
+            if (match) {
+                return `سؤال ${match[1]} - مطلوب (${match[2]})`;
+            }
+            return `سؤال ${s}`;
+        }
+
+        function formatCompactMapNumber(numVal) {
+            const s = String(numVal ?? '').trim();
+            const match = s.match(/^([^(\s]+)\s*\(([^)]+)\)$/);
+            if (match) {
+                return `${match[1]}.${match[2]}`;
+            }
+            return s;
+        }
+
+        function openSubQuestionsModal() {
+            const hw = appState.homeworks.find(h => h.id === currentHomeworkId);
+            if (!hw) return;
+            const q = hw.questions[currentQuestionIndex];
+            const baseNum = String(q.number).replace(/\s*\([^)]*\)$/, '').trim();
+            document.getElementById('subq-target-label').textContent = `سؤال ${baseNum}`;
+
+            // Count existing parts if already split
+            const existingParts = hw.questions.filter(item => {
+                const itemBase = String(item.number).replace(/\s*\([^)]*\)$/, '').trim();
+                return itemBase === baseNum;
+            });
+            document.getElementById('subq-count-input').value = existingParts.length >= 2 ? existingParts.length : 2;
+            openModal('subquestions-modal');
+        }
+
+        function applySubQuestionsSplit(e) {
+            e.preventDefault();
+            const hw = appState.homeworks.find(h => h.id === currentHomeworkId);
+            if (!hw) return;
+
+            const count = parseInt(document.getElementById('subq-count-input').value, 10);
+            if (!count || count < 2 || count > 50) {
+                showToast('اختار عدد مطاليب بين 2 و 50', 'error');
+                return;
+            }
+
+            const currentQ = hw.questions[currentQuestionIndex];
+            const baseNum = String(currentQ.number).replace(/\s*\([^)]*\)$/, '').trim();
+
+            // Find all contiguous/matching items sharing this baseNum
+            const matchingIndices = [];
+            hw.questions.forEach((item, idx) => {
+                const itemBase = String(item.number).replace(/\s*\([^)]*\)$/, '').trim();
+                if (itemBase === baseNum) matchingIndices.push(idx);
+            });
+
+            const firstIdx = matchingIndices[0];
+            const existingItems = matchingIndices.map(i => hw.questions[i]);
+
+            const newSubQuestions = Array.from({ length: count }, (_, i) => {
+                const prev = existingItems[i];
+                if (prev) {
+                    return {
+                        ...prev,
+                        number: `${baseNum} (${i + 1})`
+                    };
+                }
+                return {
+                    number: `${baseNum} (${i + 1})`,
+                    type: currentQ.type || 'mcq',
+                    correctAnswer: null,
+                    userAnswer: null,
+                    essayRevealed: false,
+                    essayScore: null,
+                    flagged: false,
+                    status: 'unanswered',
+                    errorReason: '',
+                    understood: false,
+                    note: '',
+                    questionText: '',
+                    questionImage: ''
+                };
+            });
+
+            hw.questions.splice(firstIdx, matchingIndices.length, ...newSubQuestions);
+            currentQuestionIndex = firstIdx;
+            hasUnsavedChanges = true;
+            persistState();
+
+            closeModal('subquestions-modal');
+            renderCurrentQuestion();
+            renderQuestionMap();
+            showToast(`تم تفريع سؤال ${baseNum} إلى ${count} مطاليب مع الحفاظ على ترتيب الكتاب!`, 'success');
+        }
+
         function clearCurrentAnswer() {
             const hw = appState.homeworks.find(h => h.id === currentHomeworkId);
             if (!hw) return;
             const q = hw.questions[currentQuestionIndex];
-            q.userAnswer = null;
-            q.essayScore = null;
+            if (isEnteringKeyPhase(hw)) {
+                q.correctAnswer = null;
+            } else {
+                q.userAnswer = null;
+                q.essayScore = null;
+            }
             hasUnsavedChanges = true;
             renderCurrentQuestion();
             renderQuestionMap();
-            showToast('تم تصفير إجابة السؤال', 'info');
+            showToast('تم تصفير الاختيار', 'info');
         }
 
         function toggleFlagCurrent() {
@@ -1350,23 +2774,27 @@ Rules:
             const hw = appState.homeworks.find(h => h.id === currentHomeworkId);
             if (!hw) return;
 
+            const keyMode = isEnteringKeyPhase(hw);
             const grid = document.getElementById('question-map-grid');
             grid.innerHTML = hw.questions.map((q, idx) => {
-                const answered = isQuestionAnswered(q);
+                const answered = isQuestionAnsweredInCurrentPhase(hw, q);
                 const isCurrent = (idx === currentQuestionIndex);
 
-                // Strict Color Coding: Navy Blue for answered, Faded/Muted for unanswered
                 let colorClasses = answered
-                    ? 'bg-blue-900 dark:bg-blue-800 text-white font-extrabold shadow-sm'
+                    ? (keyMode
+                        ? 'bg-emerald-600 dark:bg-emerald-700 text-white font-extrabold shadow-sm'
+                        : 'bg-blue-900 dark:bg-blue-800 text-white font-extrabold shadow-sm')
                     : 'bg-slate-200/60 dark:bg-slate-800/60 text-slate-400 dark:text-slate-500 font-semibold';
 
                 let ringClasses = isCurrent
                     ? 'ring-2 ring-offset-2 ring-blue-600 dark:ring-blue-400 dark:ring-offset-slate-900 scale-105'
                     : '';
 
+                const compactNum = formatCompactMapNumber(q.number);
+                const isSub = String(q.number).includes('(') || String(q.number).includes('.');
                 return `
-                    <button type="button" onclick="jumpToQuestion(${idx})" class="relative h-10 rounded-xl text-xs flex items-center justify-center transition-all ${colorClasses} ${ringClasses}">
-                        ${q.number}
+                    <button type="button" onclick="jumpToQuestion(${idx})" title="${escapeHtml(formatQuestionLabel(q.number))}" class="relative h-10 rounded-xl ${isSub ? 'text-[10px] font-en tracking-tighter' : 'text-xs'} flex items-center justify-center transition-all ${colorClasses} ${ringClasses}">
+                        ${escapeHtml(compactNum)}
                         ${q.flagged ? '<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900"></span>' : ''}
                     </button>
                 `;
@@ -1383,7 +2811,6 @@ Rules:
 
         function setupKeyboardShortcuts() {
             document.addEventListener('keydown', (e) => {
-                // Only trigger when Solve View is visible and no modal/input is focused
                 if (document.getElementById('view-solve').classList.contains('hidden')) return;
                 if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
 
@@ -1393,7 +2820,7 @@ Rules:
                 const isEn = hw.language === 'en';
                 const opts = isEn ? ['A', 'B', 'C', 'D'] : ['أ', 'ب', 'ج', 'د'];
 
-                if (q.type === 'mcq') {
+                if (q.type === 'mcq' || isEnteringKeyPhase(hw)) {
                     if (['1', '2', '3', '4'].includes(e.key)) {
                         selectMcqOption(opts[parseInt(e.key) - 1]);
                     } else if (['a', 'b', 'c', 'd'].includes(e.key.toLowerCase())) {
@@ -1402,8 +2829,8 @@ Rules:
                     }
                 }
 
-                if (e.key === 'ArrowLeft') nextQuestion(); // RTL next
-                if (e.key === 'ArrowRight') prevQuestion(); // RTL prev
+                if (e.key === 'ArrowLeft') nextQuestion();
+                if (e.key === 'ArrowRight') prevQuestion();
                 if (e.key.toLowerCase() === 'f') toggleFlagCurrent();
             });
         }
@@ -1415,7 +2842,24 @@ Rules:
             const hw = appState.homeworks.find(h => h.id === currentHomeworkId);
             if (!hw) return;
 
-            const unansweredCount = hw.questions.filter(q => !isQuestionAnswered(q)).length;
+            // If manual homework is still in Phase 1, move to Phase 2 instead of submitting
+            if (hw.isManual) {
+                const isPhase1 = (hw.manualOrder === 'user_first' && hw.manualPhase === 'user')
+                              || (hw.manualOrder === 'key_first' && hw.manualPhase === 'key');
+                if (isPhase1) {
+                    switchToSecondManualPhase(hw);
+                    return;
+                }
+
+                // In Phase 2, ensure at least answered questions have a model key
+                const missingKeysForAnswered = hw.questions.filter(q => q.userAnswer && !q.correctAnswer).length;
+                if (missingKeysForAnswered > 0) {
+                    showToast(`فيه ${missingKeysForAnswered} سؤال إنت جاوبته بس لسه محطتش إجابته الصح في النموذج!`, 'error');
+                    return;
+                }
+            }
+
+            const unansweredCount = hw.questions.filter(q => !(q.type === 'mcq' ? q.userAnswer : q.essayScore !== null)).length;
 
             if (unansweredCount > 0) {
                 document.getElementById('unanswered-modal-count').textContent = unansweredCount;
@@ -1435,16 +2879,20 @@ Rules:
             let max = 0;
 
             hw.questions.forEach(q => {
-                const answered = isQuestionAnswered(q);
+                const answered = (q.type === 'mcq') ? Boolean(q.userAnswer) : (q.essayScore !== null);
                 const qMax = (q.type === 'essay') ? 2 : 1;
 
                 if (!answered && mode === 'partial') {
-                    // Partial submission: do NOT grade as wrong, do NOT reveal answer
                     q.status = 'skipped_unrevealed';
                     return;
                 }
 
-                // Count towards max score
+                // In manual mode if model key wasn't provided for an unanswered question
+                if (hw.isManual && !q.correctAnswer && !answered) {
+                    q.status = 'skipped_unrevealed';
+                    return;
+                }
+
                 max += qMax;
 
                 if (!answered && mode === 'all_wrong') {
@@ -1473,10 +2921,8 @@ Rules:
             hw.percentage = max > 0 ? Math.round((earned / max) * 100) : 0;
             hw.status = (mode === 'partial') ? 'partial' : 'completed';
 
-            // If this was a temporary Retry Mistakes session, sync updated understanding/status back to original homeworks
             if (isRetrySession && hw.originMap) {
                 syncRetryResultsToOriginals(hw);
-                // Remove temporary retry homework from permanent archive
                 appState.homeworks = appState.homeworks.filter(h => h.id !== hw.id);
                 persistState();
                 hasUnsavedChanges = false;
@@ -1504,7 +2950,7 @@ Rules:
         }
 
         // =========================================================================
-        // 7. RESULTS DASHBOARD & INLINE ERROR CATEGORIZATION
+        // 7. RESULTS DASHBOARD, ERROR ANALYSIS & QUESTION TEXT/IMAGE ATTACHMENT
         // =========================================================================
         function openDashboardView(hwId) {
             const hw = appState.homeworks.find(h => h.id === hwId);
@@ -1530,7 +2976,6 @@ Rules:
                 resumePartialBtn.classList.add('hidden');
             }
 
-            // Calculate counts
             const correctCount = hw.questions.filter(q => q.status === 'correct').length;
             const wrongCount = hw.questions.filter(q => q.status === 'wrong').length;
             const partialCount = hw.questions.filter(q => q.status === 'partial' || q.status === 'skipped_unrevealed').length;
@@ -1548,6 +2993,8 @@ Rules:
 
         function resumeFromDashboard() {
             if (currentHomeworkId) {
+                const hw = appState.homeworks.find(h => h.id === currentHomeworkId);
+                if (hw && hw.isManual) hw.manualPhase = 'user';
                 openSolveView(currentHomeworkId);
             }
         }
@@ -1586,7 +3033,6 @@ Rules:
             }
 
             container.innerHTML = filtered.map(({ q, idx }) => {
-                // Color Coding: Green for Correct, Red for Wrong, Yellow/Amber for Partial or Skipped
                 let cardBorder = 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900';
                 let badgeHtml = '';
 
@@ -1604,7 +3050,6 @@ Rules:
                     badgeHtml = '<span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">متروك (تسليم جزئي) 🟡</span>';
                 }
 
-                // Answer Comparison Display
                 let comparisonHtml = '';
                 if (q.status === 'skipped_unrevealed') {
                     comparisonHtml = `<p class="text-xs text-slate-500 dark:text-slate-400 italic">لم يتم حل هذا السؤال بعد — الإجابة مخفية عشان تقدر تحله بنفسك لاحقاً.</p>`;
@@ -1612,7 +3057,7 @@ Rules:
                     comparisonHtml = `
                         <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm">
                             <span>إجابتك: <strong class="px-2.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 ${hw.language === 'en' ? 'font-en' : ''}">${q.userAnswer || 'لم تجب'}</strong></span>
-                            <span>الإجابة النموذجية: <strong class="px-2.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 ${hw.language === 'en' ? 'font-en' : ''}">${q.correctAnswer}</strong></span>
+                            <span>الإجابة النموذجية: <strong class="px-2.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 ${hw.language === 'en' ? 'font-en' : ''}">${q.correctAnswer || '-'}</strong></span>
                         </div>
                     `;
                 } else {
@@ -1624,24 +3069,56 @@ Rules:
                     `;
                 }
 
-                // Inline Error Categorization (for Wrong or Partial)
+                // Error Categorization + Question Text & Image Attachment (for Wrong or Partial)
                 let errorAnalysisHtml = '';
                 if (q.status === 'wrong' || q.status === 'partial') {
                     errorAnalysisHtml = `
-                        <div class="mt-3 pt-3 border-t border-slate-200/70 dark:border-slate-700/70 grid grid-cols-1 md:grid-cols-12 gap-2.5 items-center">
-                            <div class="md:col-span-4">
-                                <select onchange="updateQuestionErrorMeta('${hw.id}', ${idx}, 'errorReason', this.value)" class="w-full px-3 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
-                                    <option value="">-- اختر سبب الغلط --</option>
-                                    ${ERROR_REASONS.map(r => `<option value="${r}" ${q.errorReason === r ? 'selected' : ''}>${r}</option>`).join('')}
-                                </select>
+                        <div class="mt-3 pt-3 border-t border-slate-200/70 dark:border-slate-700/70 space-y-3">
+                            <!-- Row 1: Reason, Understood toggle, Personal Note -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-center">
+                                <div class="md:col-span-4">
+                                    <select onchange="updateQuestionErrorMeta('${hw.id}', ${idx}, 'errorReason', this.value)" class="w-full px-3 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
+                                        <option value="">-- اختر سبب الغلط --</option>
+                                        ${ERROR_REASONS.map(r => `<option value="${r}" ${q.errorReason === r ? 'selected' : ''}>${r}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="md:col-span-3">
+                                    <button type="button" onclick="toggleQuestionUnderstood('${hw.id}', ${idx})" class="w-full px-3 py-2 rounded-xl text-xs font-extrabold border transition-all ${q.understood ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-800'}">
+                                        ${q.understood ? 'فهمت غلطي خلاص ✅' : 'لسه مفهمتوش ❌'}
+                                    </button>
+                                </div>
+                                <div class="md:col-span-5">
+                                    <input type="text" value="${escapeHtml(q.note || '')}" onchange="updateQuestionErrorMeta('${hw.id}', ${idx}, 'note', this.value)" placeholder="ملاحظة شخصية سريعة (قانون / تنبيه)..." class="w-full px-3 py-2 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
+                                </div>
                             </div>
-                            <div class="md:col-span-3">
-                                <button type="button" onclick="toggleQuestionUnderstood('${hw.id}', ${idx})" class="w-full px-3 py-2 rounded-xl text-xs font-extrabold border transition-all ${q.understood ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-800'}">
-                                    ${q.understood ? 'فهمت غلطي خلاص ✅' : 'لسه مفهمتوش ❌'}
-                                </button>
-                            </div>
-                            <div class="md:col-span-5">
-                                <input type="text" value="${escapeHtml(q.note || '')}" onchange="updateQuestionErrorMeta('${hw.id}', ${idx}, 'note', this.value)" placeholder="اكتب ملاحظة شخصية سريعة (قانون / تنبيه)..." class="w-full px-3 py-2 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
+
+                            <!-- Row 2: Attach Question Text and/or Image (Diagram/Table) -->
+                            <div class="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-2.5">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <span class="text-xs font-extrabold text-indigo-800 dark:text-indigo-300 flex items-center gap-1.5">
+                                        <i class="ph-bold ph-image text-base"></i> إرفاق السؤال نفسه (كتابة أو صورة مخطط/جدول):
+                                    </span>
+                                    <div class="flex items-center gap-2">
+                                        <label class="cursor-pointer px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/70 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold flex items-center gap-1 transition-colors">
+                                            <i class="ph-bold ph-camera-plus text-sm"></i>
+                                            <span>${q.questionImage ? 'تغيير الصورة' : 'ارفع صورة السؤال'}</span>
+                                            <input type="file" accept="image/*" class="hidden" onchange="handleQuestionImageUpload(event, '${hw.id}', ${idx})">
+                                        </label>
+                                        ${q.questionImage ? `
+                                            <button type="button" onclick="removeQuestionImage('${hw.id}', ${idx})" class="px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400 text-xs font-bold hover:bg-rose-100">
+                                                حذف الصورة
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+
+                                <textarea rows="2" onchange="updateQuestionErrorMeta('${hw.id}', ${idx}, 'questionText', this.value)" placeholder="اكتب نص السؤال هنا (أو ارفع صورته لو فيه رسمة أو جدول عشان تلاقيه في وشك في الاختبار)..." class="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-indigo-600 focus:outline-none">${escapeHtml(q.questionText || '')}</textarea>
+
+                                ${q.questionImage ? `
+                                    <div class="pt-1">
+                                        <img src="${q.questionImage}" alt="صورة السؤال" onclick="openImageLightbox(this.src)" class="max-h-48 rounded-xl border border-slate-300 dark:border-slate-600 cursor-zoom-in object-contain bg-white">
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
                     `;
@@ -1651,7 +3128,7 @@ Rules:
                     <div class="rounded-2xl p-4 border ${cardBorder} transition-all">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="font-black text-base">سؤال ${q.number}</span>
+                                <span class="font-black text-base">${escapeHtml(formatQuestionLabel(q.number))}</span>
                                 ${badgeHtml}
                                 ${q.flagged ? '<span class="text-amber-500 text-xs font-bold"><i class="ph-fill ph-flag"></i> مراجعة</span>' : ''}
                             </div>
@@ -1661,6 +3138,66 @@ Rules:
                     </div>
                 `;
             }).join('');
+        }
+
+        // Compress and attach image as Base64 DataURL so LocalStorage stays lightweight
+        function handleQuestionImageUpload(event, hwId, qIdx) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 900;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) {
+                            h = Math.round((h * maxDim) / w);
+                            w = maxDim;
+                        } else {
+                            w = Math.round((w * maxDim) / h);
+                            h = maxDim;
+                        }
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.72);
+                    updateQuestionErrorMeta(hwId, qIdx, 'questionImage', compressedDataUrl);
+
+                    if (!document.getElementById('view-dashboard').classList.contains('hidden')) {
+                        renderDashboardQuestions();
+                    }
+                    if (!document.getElementById('view-mistakes').classList.contains('hidden')) {
+                        renderMistakesHub();
+                    }
+                    showToast('تم حفظ صورة السؤال! هتظهرلك في وشك لما تراجع أو تختبر نفسك.', 'success');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function removeQuestionImage(hwId, qIdx) {
+            updateQuestionErrorMeta(hwId, qIdx, 'questionImage', '');
+            if (!document.getElementById('view-dashboard').classList.contains('hidden')) {
+                renderDashboardQuestions();
+            }
+            if (!document.getElementById('view-mistakes').classList.contains('hidden')) {
+                renderMistakesHub();
+            }
+            showToast('تم حذف صورة السؤال.', 'info');
+        }
+
+        function openImageLightbox(src) {
+            document.getElementById('lightbox-img-el').src = src;
+            openModal('image-lightbox-modal');
         }
 
         function updateQuestionErrorMeta(hwId, qIdx, field, value) {
@@ -1686,7 +3223,7 @@ Rules:
         }
 
         // =========================================================================
-        // 8. "أخطائي" (MY MISTAKES HUB, ANALYTICS & RETRY MODE)
+        // 8. "أخطائي" (MY MISTAKES HUB, ANALYTICS & RETRY MODE WITH ATTACHMENTS)
         // =========================================================================
         function getAllMistakes() {
             const list = [];
@@ -1713,7 +3250,6 @@ Rules:
         function renderMistakesHub() {
             const allMistakes = getAllMistakes();
 
-            // Populate Subject Filter Dropdown
             const subjSelect = document.getElementById('mistakes-filter-subject');
             const currentSubjVal = subjSelect.value;
             const subjects = [...new Set(appState.homeworks.map(h => h.subject))];
@@ -1723,7 +3259,6 @@ Rules:
             renderSubjectPerformanceAndImprovement(subjects);
             renderErrorRadarChart(allMistakes);
 
-            // Apply Smart Filters
             const fSubj = subjSelect.value;
             const fReason = document.getElementById('mistakes-filter-reason').value;
             const fStatus = document.getElementById('mistakes-filter-status').value;
@@ -1739,12 +3274,10 @@ Rules:
                 return true;
             });
 
-            // Update Retry Mistakes Button
             const retryBtn = document.getElementById('retry-mistakes-btn');
             document.getElementById('retry-count-label').textContent = filtered.length;
             retryBtn.disabled = (filtered.length === 0);
 
-            // Group by Subject -> Lesson -> Book
             const container = document.getElementById('mistakes-grouped-container');
             if (filtered.length === 0) {
                 container.innerHTML = `
@@ -1757,7 +3290,6 @@ Rules:
                 return;
             }
 
-            // Grouping map
             const groups = {};
             filtered.forEach(item => {
                 const key = `${item.subject}|||${item.chapter} - ${item.lesson}|||${item.book}`;
@@ -1790,14 +3322,14 @@ Rules:
                         </span>
                     </div>
 
-                    <div class="space-y-2.5">
+                    <div class="space-y-3">
                         ${group.items.map(item => {
                             const q = item.question;
                             return `
-                                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5">
+                                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-3">
                                     <div class="flex flex-wrap items-center justify-between gap-2">
                                         <div class="flex items-center gap-2">
-                                            <span class="font-black text-sm px-2.5 py-1 rounded-lg bg-rose-500 text-white">سؤال ${q.number}</span>
+                                            <span class="font-black text-sm px-2.5 py-1 rounded-lg bg-rose-500 text-white">${escapeHtml(formatQuestionLabel(q.number))}</span>
                                             ${q.type === 'mcq'
                                                 ? `<span class="text-xs">إجابتك: <strong class="text-rose-600 ${item.language === 'en' ? 'font-en' : ''}">${q.userAnswer || 'متروك'}</strong> | الصح: <strong class="text-emerald-600 ${item.language === 'en' ? 'font-en' : ''}">${q.correctAnswer}</strong></span>`
                                                 : `<span class="text-xs font-bold text-amber-600">مقالي (${q.essayScore}/2)</span>`
@@ -1807,6 +3339,24 @@ Rules:
                                         <button type="button" onclick="toggleQuestionUnderstood('${item.hwId}', ${item.qIdx})" class="px-3 py-1.5 rounded-xl text-xs font-extrabold border transition-all ${q.understood ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-900 text-rose-600 border-rose-300 dark:border-rose-800'}">
                                             ${q.understood ? 'فهمت غلطي خلاص ✅' : 'لسه مفهمتوش ❌'}
                                         </button>
+                                    </div>
+
+                                    <!-- Saved Question Text or Image Preview -->
+                                    ${(q.questionText || q.questionImage) ? `
+                                        <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-indigo-200/70 dark:border-indigo-800/50 space-y-2">
+                                            ${q.questionText ? `<p class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 whitespace-pre-line">${escapeHtml(q.questionText)}</p>` : ''}
+                                            ${q.questionImage ? `<img src="${q.questionImage}" alt="صورة السؤال" onclick="openImageLightbox(this.src)" class="max-h-48 rounded-lg border border-slate-200 dark:border-slate-700 cursor-zoom-in object-contain bg-white">` : ''}
+                                        </div>
+                                    ` : ''}
+
+                                    <!-- Quick Edit Text/Image inside Mistakes Archive too -->
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <label class="cursor-pointer px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 text-[11px] font-bold flex items-center gap-1">
+                                            <i class="ph-bold ph-camera-plus"></i>
+                                            <span>${q.questionImage ? 'تغيير صورة السؤال' : 'إضافة صورة للسؤال'}</span>
+                                            <input type="file" accept="image/*" class="hidden" onchange="handleQuestionImageUpload(event, '${item.hwId}', ${item.qIdx})">
+                                        </label>
+                                        ${q.questionImage ? `<button type="button" onclick="removeQuestionImage('${item.hwId}', ${item.qIdx})" class="text-[11px] font-bold text-rose-500 hover:underline">حذف الصورة</button>` : ''}
                                     </div>
 
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1832,7 +3382,6 @@ Rules:
             }
 
             grid.innerHTML = subjects.map(subj => {
-                // Graded homeworks sorted chronologically (oldest to newest)
                 const gradedHws = appState.homeworks
                     .filter(h => h.subject === subj && h.status !== 'in_progress' && h.scoreMax > 0)
                     .slice()
@@ -1849,7 +3398,6 @@ Rules:
 
                 const avgPercent = Math.round(gradedHws.reduce((acc, h) => acc + h.percentage, 0) / gradedHws.length);
 
-                // Improvement rate: compare latest homework vs average of previous homeworks
                 let improvementHtml = `<span class="text-[11px] text-slate-400">أول واجب مسجل</span>`;
                 if (gradedHws.length >= 2) {
                     const latest = gradedHws[gradedHws.length - 1].percentage;
@@ -1936,7 +3484,10 @@ Rules:
                     status: 'unanswered',
                     errorReason: '',
                     understood: false,
-                    note: ''
+                    note: '',
+                    questionText: item.question.questionText || '',
+                    questionImage: item.question.questionImage || '',
+                    originLabel: `${item.subject} • ${item.book} • ${item.chapter} • ${item.lesson} (${formatQuestionLabel(item.question.number)})`
                 };
             });
 
@@ -1949,6 +3500,7 @@ Rules:
                 language: filtered[0].language || 'ar',
                 createdAt: new Date().toLocaleDateString('ar-EG'),
                 status: 'in_progress',
+                isManual: false,
                 questions: retryQuestions,
                 originMap
             };
@@ -2007,7 +3559,7 @@ Rules:
             if (list.length === 0) {
                 container.innerHTML = `
                     <div class="col-span-full bg-white dark:bg-slate-900 rounded-3xl p-8 text-center border border-slate-200 dark:border-slate-800">
-                        <p class="font-bold text-slate-500 dark:text-slate-400">مفيش واجبات محفوظة لسه. ارفع أول ملف إجابات أو جرّب الواجب التجريبي!</p>
+                        <p class="font-bold text-slate-500 dark:text-slate-400">مفيش واجبات محفوظة لسه. ارفع أول ملف إجابات، أنشئ واجب يدوي، أو جرّب الواجب التجريبي!</p>
                     </div>
                 `;
                 return;
@@ -2069,7 +3621,6 @@ Rules:
             showToast('تم حذف الواجب من الأرشيف.', 'info');
         }
 
-        // Share Clean Answer Key JSON with peers
         function shareHomeworkKey(hwId) {
             const hw = appState.homeworks.find(h => h.id === hwId);
             if (!hw) return;
@@ -2079,7 +3630,7 @@ Rules:
                 questions: hw.questions.map(q => ({
                     number: q.number,
                     type: q.type,
-                    answer: q.correctAnswer
+                    answer: q.correctAnswer || ''
                 }))
             };
 
@@ -2087,14 +3638,16 @@ Rules:
             showToast('تم تحميل ملف نموذج الإجابة الصافي! ابعته لأصحابك يحلوه.', 'success');
         }
 
-        // Full Backup Export & Restore
         function openBackupModal() {
             openModal('backup-modal');
         }
 
         function exportFullBackup() {
-            downloadJsonFile(appState, `نسخة_احتياطية_البابل_شيت_${new Date().toISOString().slice(0, 10)}.json`);
-            showToast('تم تحميل النسخة الاحتياطية الكاملة بنجاح!', 'success');
+            const userNamePart = (appState.userProfile && appState.userProfile.name)
+                ? `_${appState.userProfile.name.replace(/\s+/g, '_')}`
+                : '';
+            downloadJsonFile(appState, `ملف_البابل_شيت${userNamePart}_${new Date().toISOString().slice(0, 10)}.json`);
+            showToast('تم تحميل ملفك الاحتياطي الشامل (الاسم + النماذج + الأخطاء) بنجاح!', 'success');
         }
 
         function importFullBackup(event) {
@@ -2108,13 +3661,17 @@ Rules:
                     if (!data || !Array.isArray(data.homeworks)) {
                         throw new Error('Invalid backup');
                     }
-                    // Merge without duplicates by ID
                     const existingIds = new Set(appState.homeworks.map(h => h.id));
                     data.homeworks.forEach(hw => {
                         if (!existingIds.has(hw.id)) {
                             appState.homeworks.push(hw);
                         }
                     });
+                    if (data.userProfile) {
+                        appState.userProfile = data.userProfile;
+                        applyColorTheme(data.userProfile.colorTheme || 'blue', true);
+                        applyUserPersonalization();
+                    }
                     persistState();
                     refreshAllUI();
                     closeModal('backup-modal');
@@ -2165,7 +3722,7 @@ Rules:
                 toast.style.opacity = '0';
                 toast.style.transition = 'opacity 0.3s ease';
                 setTimeout(() => toast.remove(), 300);
-            }, 3200);
+            }, 3400);
         }
 
         function escapeHtml(str) {
@@ -2177,7 +3734,6 @@ Rules:
                 .replace(/'/g, '&#039;');
         }
 
-        // Initialize on window load
         window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
