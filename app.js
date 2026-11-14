@@ -13,6 +13,7 @@ let selectedInitTheme = 'blue';
 let appState = {
     userProfile: null, // { name, gender, colorTheme, createdAt }
     homeworks: [], // Array of Homework Objects
+    subjectIcons: {}, // { [subjectName]: iconKey }
     solveMode: 'standard', // 'standard' or 'auto'
 };
 
@@ -25,6 +26,17 @@ let hasUnsavedChanges = false;
 let dashboardFilter = 'all';
 let isRetrySession = false;
 let pendingTargetUrl = null;
+let pendingDeleteHwId = null;
+
+// Homeworks Folders Explorer state
+let folderNavState = {
+    subject: null,
+    book: null,
+    chapter: null
+};
+let folderSelectionMode = false;
+let selectedExportHwIds = new Set();
+let iconPickerTargetSubject = null;
 
 const ERROR_REASONS = [
     'عوضت غلط',
@@ -49,6 +61,7 @@ function initApp() {
                 appState.homeworks = parsed.homeworks;
                 appState.solveMode = parsed.solveMode || 'standard';
                 appState.userProfile = parsed.userProfile || null;
+                appState.subjectIcons = parsed.subjectIcons || {};
             }
         }
     } catch (e) {
@@ -70,6 +83,8 @@ function initApp() {
     if (page === 'home') {
         setupDragAndDrop();
         refreshAllUI();
+    } else if (page === 'homeworks') {
+        initHomeworksExplorerPage();
     } else if (page === 'solve') {
         setupKeyboardShortcuts();
         initSolvePage();
@@ -90,18 +105,21 @@ function initApp() {
 
 function updateActiveNavHighlight(page) {
     const homeBtn = document.getElementById('nav-home-btn');
+    const homeworksBtn = document.getElementById('nav-homeworks-btn');
     const mistakesBtn = document.getElementById('nav-mistakes-btn');
     if (!homeBtn || !mistakesBtn) return;
 
+    const inactiveBase = 'px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
+    homeBtn.className = inactiveBase;
+    if (homeworksBtn) homeworksBtn.className = inactiveBase;
+    mistakesBtn.className = 'relative ' + inactiveBase;
+
     if (page === 'home') {
         homeBtn.className = 'px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors bg-blue-50 text-blue-900 dark:bg-blue-950/60 dark:text-blue-300';
-        mistakesBtn.className = 'relative px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
+    } else if (page === 'homeworks' && homeworksBtn) {
+        homeworksBtn.className = 'px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors bg-blue-50 text-blue-900 dark:bg-blue-950/60 dark:text-blue-300';
     } else if (page === 'mistakes') {
         mistakesBtn.className = 'relative px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors bg-rose-50 text-rose-900 dark:bg-rose-950/50 dark:text-rose-300';
-        homeBtn.className = 'px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
-    } else {
-        homeBtn.className = 'px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
-        mistakesBtn.className = 'relative px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
     }
 }
 
@@ -240,9 +258,9 @@ function saveNewUserProfile(e) {
         'success'
     );
 
-    if (getCurrentPage() === 'home' && localStorage.getItem(TUTORIAL_DISMISSED_KEY) !== 'true') {
-        openTutorialFromStart();
-    }
+    // New user: show usage guide immediately right after entering profile data
+    localStorage.removeItem(TUTORIAL_DISMISSED_KEY);
+    openTutorialFromStart();
 }
 
 function handleInitialBackupRestore(event) {
@@ -258,6 +276,7 @@ function handleInitialBackupRestore(event) {
             }
             appState.homeworks = data.homeworks;
             appState.solveMode = data.solveMode || 'standard';
+            appState.subjectIcons = data.subjectIcons || {};
             appState.userProfile = data.userProfile || {
                 name: 'بطل المذاكرة',
                 gender: 'male',
@@ -268,6 +287,7 @@ function handleInitialBackupRestore(event) {
             applyColorTheme(appState.userProfile.colorTheme || 'blue', true);
             persistState();
             refreshAllUI();
+            if (getCurrentPage() === 'homeworks') renderFoldersExplorer();
             applyUserPersonalization();
             closeModal('user-init-modal');
             localStorage.setItem(TUTORIAL_DISMISSED_KEY, 'true');
@@ -397,6 +417,7 @@ function updateThemeIcon(isDark) {
 // =========================================================================
 const PAGE_ROUTES = {
     home: 'index.html',
+    homeworks: 'homeworks.html',
     solve: 'solve.html',
     dashboard: 'dashboard.html',
     mistakes: 'mistakes.html'
@@ -898,7 +919,18 @@ function renderCurrentQuestion() {
     document.getElementById('q-number-display').textContent = formatQuestionLabel(q.number);
     document.getElementById('q-total-display').textContent = `(عنصر ${currentQuestionIndex + 1} من ${total})`;
     const splitBtn = document.getElementById('split-subq-btn');
-    if (splitBtn) splitBtn.classList.toggle('hidden', isRetrySession);
+    const splitBtnText = document.getElementById('split-subq-btn-text');
+    const unsplitBtn = document.getElementById('unsplit-subq-btn');
+    const isSubQ = isSubQuestionNumber(q.number);
+    if (splitBtn) {
+        splitBtn.classList.toggle('hidden', isRetrySession);
+        if (splitBtnText) {
+            splitBtnText.textContent = isSubQ ? '+ فرّع المطلوب لمطاليب' : '+ فرّع السؤال لمطاليب';
+        }
+    }
+    if (unsplitBtn) {
+        unsplitBtn.classList.toggle('hidden', isRetrySession || !isSubQ);
+    }
     document.getElementById('q-type-badge').textContent = keyMode
         ? 'إدخال إجابة النموذج'
         : (q.type === 'mcq' ? 'اختيار من متعدد' : 'سؤال مقالي (تقييم ذاتي)');
@@ -1081,6 +1113,11 @@ function gradeEssay(score) {
     renderQuestionMap();
 }
 
+function isSubQuestionNumber(numVal) {
+    const s = String(numVal ?? '').trim();
+    return /\([^)]+\)/.test(s) || s.includes('.');
+}
+
 function formatQuestionLabel(numVal) {
     const s = String(numVal ?? '').trim();
     const match = s.match(/^([^(\s]+)\s*\(([^)]+)\)$/);
@@ -1103,14 +1140,29 @@ function openSubQuestionsModal() {
     const hw = appState.homeworks.find(h => h.id === currentHomeworkId);
     if (!hw) return;
     const q = hw.questions[currentQuestionIndex];
-    const baseNum = String(q.number).replace(/\s*\([^)]*\)$/, '').trim();
-    document.getElementById('subq-target-label').textContent = `سؤال ${baseNum}`;
+    const sNum = String(q.number).trim();
+    const isSub = isSubQuestionNumber(sNum);
 
-    const existingParts = hw.questions.filter(item => {
-        const itemBase = String(item.number).replace(/\s*\([^)]*\)$/, '').trim();
-        return itemBase === baseNum;
-    });
-    document.getElementById('subq-count-input').value = existingParts.length >= 2 ? existingParts.length : 2;
+    // If current item is ALREADY a sub-question like "5 (2)" or "5 (2.1)", allow splitting THAT sub-question into nested parts "5 (2.1)", "5 (2.2)"
+    document.getElementById('subq-target-label').textContent = isSub ? formatQuestionLabel(sNum) : `سؤال ${sNum}`;
+
+    if (isSub) {
+        const match = sNum.match(/^([^(\s]+)\s*\(([^)]+)\)$/);
+        const mainRoot = match ? match[1] : sNum;
+        const subPart = match ? match[2] : '';
+        const existingNested = hw.questions.filter(item => {
+            const m = String(item.number).trim().match(/^([^(\s]+)\s*\(([^)]+)\)$/);
+            return m && m[1] === mainRoot && (m[2] === subPart || m[2].startsWith(subPart + '.'));
+        });
+        document.getElementById('subq-count-input').value = existingNested.length >= 2 ? existingNested.length : 2;
+    } else {
+        const existingParts = hw.questions.filter(item => {
+            const itemBase = String(item.number).replace(/\s*\([^)]*\)$/, '').trim();
+            return itemBase === sNum;
+        });
+        document.getElementById('subq-count-input').value = existingParts.length >= 2 ? existingParts.length : 2;
+    }
+
     openModal('subquestions-modal');
 }
 
@@ -1126,8 +1178,61 @@ function applySubQuestionsSplit(e) {
     }
 
     const currentQ = hw.questions[currentQuestionIndex];
-    const baseNum = String(currentQ.number).replace(/\s*\([^)]*\)$/, '').trim();
+    const sNum = String(currentQ.number).trim();
+    const subMatch = sNum.match(/^([^(\s]+)\s*\(([^)]+)\)$/);
 
+    if (subMatch) {
+        // Splitting an existing sub-question (e.g., "5 (2)" -> "5 (2.1)", "5 (2.2)", ...)
+        const mainRoot = subMatch[1];
+        const subPart = subMatch[2];
+        const matchingIndices = [];
+        hw.questions.forEach((item, idx) => {
+            const m = String(item.number).trim().match(/^([^(\s]+)\s*\(([^)]+)\)$/);
+            if (m && m[1] === mainRoot && (m[2] === subPart || m[2].startsWith(subPart + '.'))) {
+                matchingIndices.push(idx);
+            }
+        });
+
+        const firstIdx = matchingIndices[0];
+        const existingItems = matchingIndices.map(i => hw.questions[i]);
+
+        const newNested = Array.from({ length: count }, (_, i) => {
+            const prev = existingItems[i];
+            const newNum = `${mainRoot} (${subPart}.${i + 1})`;
+            if (prev) {
+                return { ...prev, number: newNum };
+            }
+            return {
+                number: newNum,
+                type: currentQ.type || 'mcq',
+                correctAnswer: null,
+                userAnswer: null,
+                essayRevealed: false,
+                essayScore: null,
+                flagged: false,
+                status: 'unanswered',
+                errorReason: '',
+                understood: false,
+                note: '',
+                questionText: '',
+                questionImage: ''
+            };
+        });
+
+        hw.questions.splice(firstIdx, matchingIndices.length, ...newNested);
+        currentQuestionIndex = firstIdx;
+        hasUnsavedChanges = true;
+        persistState();
+
+        closeModal('subquestions-modal');
+        renderCurrentQuestion();
+        renderQuestionMap();
+        showToast(`تم تفريع مطلوب (${subPart}) إلى ${count} مطاليب فرعية!`, 'success');
+        return;
+    }
+
+    // Splitting a main question (e.g., "5" -> "5 (1)", "5 (2)", ...)
+    const baseNum = sNum;
     const matchingIndices = [];
     hw.questions.forEach((item, idx) => {
         const itemBase = String(item.number).replace(/\s*\([^)]*\)$/, '').trim();
@@ -1171,6 +1276,64 @@ function applySubQuestionsSplit(e) {
     renderCurrentQuestion();
     renderQuestionMap();
     showToast(`تم تفريع سؤال ${baseNum} إلى ${count} مطاليب مع الحفاظ على ترتيب الكتاب!`, 'success');
+}
+
+function unsplitCurrentSubQuestion() {
+    const hw = appState.homeworks.find(h => h.id === currentHomeworkId);
+    if (!hw) return;
+
+    const currentQ = hw.questions[currentQuestionIndex];
+    const sNum = String(currentQ.number).trim();
+    const match = sNum.match(/^([^(\s]+)\s*\(([^)]+)\)$/);
+    if (!match) return;
+
+    const mainRoot = match[1];
+    const subPart = match[2];
+
+    // If nested sub-question like "5 (2.1)", merge back to parent sub-question "5 (2)" first
+    if (subPart.includes('.')) {
+        const parentSub = subPart.split('.').slice(0, -1).join('.');
+        const matchingIndices = [];
+        hw.questions.forEach((item, idx) => {
+            const m = String(item.number).trim().match(/^([^(\s]+)\s*\(([^)]+)\)$/);
+            if (m && m[1] === mainRoot && (m[2] === parentSub || m[2].startsWith(parentSub + '.'))) {
+                matchingIndices.push(idx);
+            }
+        });
+        const firstIdx = matchingIndices[0];
+        const kept = { ...hw.questions[firstIdx], number: `${mainRoot} (${parentSub})` };
+        hw.questions.splice(firstIdx, matchingIndices.length, kept);
+        currentQuestionIndex = firstIdx;
+        hasUnsavedChanges = true;
+        persistState();
+        renderCurrentQuestion();
+        renderQuestionMap();
+        showToast(`تم إلغاء تفريع مطلوب (${parentSub}) وإرجاعه مطلوب واحد!`, 'info');
+        return;
+    }
+
+    // Otherwise merge all sub-questions of mainRoot back into single main question "mainRoot"
+    const matchingIndices = [];
+    hw.questions.forEach((item, idx) => {
+        const itemBase = String(item.number).replace(/\s*\([^)]*\)$/, '').trim();
+        if (itemBase === mainRoot) matchingIndices.push(idx);
+    });
+
+    if (matchingIndices.length === 0) return;
+    const firstIdx = matchingIndices[0];
+    const keptQuestion = {
+        ...hw.questions[firstIdx],
+        number: mainRoot
+    };
+
+    hw.questions.splice(firstIdx, matchingIndices.length, keptQuestion);
+    currentQuestionIndex = firstIdx;
+    hasUnsavedChanges = true;
+    persistState();
+
+    renderCurrentQuestion();
+    renderQuestionMap();
+    showToast(`تم إلغاء تفريع سؤال ${mainRoot} وإرجاعه سؤال واحد!`, 'info');
 }
 
 function clearCurrentAnswer() {
@@ -2068,6 +2231,9 @@ function renderHomeArchive() {
                     </div>
 
                     <div class="flex items-center gap-1">
+                        <button onclick="openEditHomeworkMetaModal('${hw.id}')" class="p-2 rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40" title="تعديل بيانات التسليم">
+                            <i class="ph-bold ph-note-pencil text-base"></i>
+                        </button>
                         <button onclick="shareHomeworkKey('${hw.id}')" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" title="مشاركة ملف نموذج الإجابة مع أصحابك">
                             <i class="ph-bold ph-share-network text-base"></i>
                         </button>
@@ -2082,10 +2248,69 @@ function renderHomeArchive() {
 }
 
 function deleteHomework(hwId) {
-    appState.homeworks = appState.homeworks.filter(h => h.id !== hwId);
+    const hw = appState.homeworks.find(h => h.id === hwId);
+    if (!hw) return;
+    pendingDeleteHwId = hwId;
+    const targetEl = document.getElementById('delete-hw-target-name');
+    if (targetEl) {
+        targetEl.textContent = `${hw.subject} — ${hw.book} (${hw.chapter} • ${hw.lesson})`;
+        openModal('delete-confirm-modal');
+    } else {
+        // Fallback if modal not present
+        confirmDeleteHomework();
+    }
+}
+
+function confirmDeleteHomework() {
+    if (!pendingDeleteHwId) return;
+    const deletedId = pendingDeleteHwId;
+    appState.homeworks = appState.homeworks.filter(h => h.id !== deletedId);
+    selectedExportHwIds.delete(deletedId);
+    pendingDeleteHwId = null;
     persistState();
-    refreshAllUI();
+    updateGlobalStats();
+
+    if (getCurrentPage() === 'home') refreshAllUI();
+    if (getCurrentPage() === 'homeworks') renderFoldersExplorer();
+
+    closeModal('delete-confirm-modal');
     showToast('تم حذف الواجب من الأرشيف.', 'info');
+}
+
+function openEditHomeworkMetaModal(hwId) {
+    const hw = appState.homeworks.find(h => h.id === hwId);
+    if (!hw) return;
+    populateSubjectsDatalist();
+    document.getElementById('edit-meta-hw-id').value = hw.id;
+    document.getElementById('edit-meta-subject').value = hw.subject || '';
+    document.getElementById('edit-meta-book').value = hw.book || '';
+    document.getElementById('edit-meta-chapter').value = hw.chapter || '';
+    document.getElementById('edit-meta-lesson').value = hw.lesson || '';
+    document.getElementById('edit-meta-lang').value = hw.language || 'ar';
+    openModal('edit-hw-meta-modal');
+}
+
+function saveEditedHomeworkMeta(e) {
+    e.preventDefault();
+    const hwId = document.getElementById('edit-meta-hw-id').value;
+    const hw = appState.homeworks.find(h => h.id === hwId);
+    if (!hw) return;
+
+    hw.subject = document.getElementById('edit-meta-subject').value.trim();
+    hw.book = document.getElementById('edit-meta-book').value.trim();
+    hw.chapter = document.getElementById('edit-meta-chapter').value.trim();
+    hw.lesson = document.getElementById('edit-meta-lesson').value.trim();
+    hw.language = document.getElementById('edit-meta-lang').value;
+
+    persistState();
+    closeModal('edit-hw-meta-modal');
+
+    const page = getCurrentPage();
+    if (page === 'home') refreshAllUI();
+    if (page === 'homeworks') renderFoldersExplorer();
+    if (page === 'dashboard') initDashboardPage();
+
+    showToast('تم تعديل بيانات الواجب بنجاح!', 'success');
 }
 
 function shareHomeworkKey(hwId) {
@@ -2134,6 +2359,9 @@ function importFullBackup(event) {
                     appState.homeworks.push(hw);
                 }
             });
+            if (data.subjectIcons && typeof data.subjectIcons === 'object') {
+                appState.subjectIcons = { ...appState.subjectIcons, ...data.subjectIcons };
+            }
             if (data.userProfile) {
                 appState.userProfile = data.userProfile;
                 applyColorTheme(data.userProfile.colorTheme || 'blue', true);
@@ -2208,6 +2436,555 @@ function escapeHtml(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+
+// =========================================================================
+// 11. HOMEWORKS FOLDERS EXPLORER, CUSTOM SVG SUBJECT ICONS & SELECTIVE EXPORT
+// =========================================================================
+const SUBJECT_SVG_ICONS = [
+    { key: 'folder', label: 'مجلد عام', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' },
+    { key: 'atom', label: 'فيزياء / ذرة', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(90 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(150 12 12)"/></svg>' },
+    { key: 'flask', label: 'كيمياء / مختبر', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M9 3h6"/><path d="M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7 15h10"/></svg>' },
+    { key: 'dna', label: 'أحياء / وراثة', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/><path d="M17 6l-2.5-2.5"/><path d="M14 8l-1-1"/><path d="M7 18l2.5 2.5"/><path d="M3.5 14.5l.5.5"/><path d="M20 9l.5.5"/><path d="M6.5 12.5l1 1"/><path d="M16.5 10.5l1 1"/><path d="M10 16l1.5 1.5"/></svg>' },
+    { key: 'calculator', label: 'رياضيات / جبر', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>' },
+    { key: 'compass', label: 'هندسة / رسم', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><circle cx="12" cy="5" r="2"/><path d="M10.5 6.5L5 21"/><path d="M13.5 6.5L19 21"/><path d="M6 15h12"/><path d="M12 2v1"/></svg>' },
+    { key: 'sigma', label: 'تفاضل وتكامل', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M18 7V4H6l6 8-6 8h12v-3"/></svg>' },
+    { key: 'feather', label: 'لغة عربية / أدب', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>' },
+    { key: 'languages', label: 'لغة أجنبية', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>' },
+    { key: 'globe', label: 'جغرافيا / عالم', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' },
+    { key: 'landmark', label: 'تاريخ / حضارة', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>' },
+    { key: 'brain', label: 'فلسفة / علم نفس', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.54"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.54"/></svg>' },
+    { key: 'layers', label: 'جيولوجيا / طبقات', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>' },
+    { key: 'cpu', label: 'برمجة / حاسب', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>' },
+    { key: 'microscope', label: 'علوم / مجهر', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></svg>' },
+    { key: 'magnet', label: 'كهربية ومغناطيسية', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M6 15v-2a6 6 0 1 1 12 0v2"/><path d="M6 15h4v4H6z"/><path d="M14 15h4v4h-4z"/></svg>' },
+    { key: 'book_open', label: 'كتاب / قراءة', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>' },
+    { key: 'scale', label: 'اقتصاد / قانون', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M16 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>' },
+    { key: 'heart_pulse', label: 'طب / فسيولوجي', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg>' },
+    { key: 'mosque_star', label: 'تربية دينية', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4"/><path d="M21 5h-4"/></svg>' },
+    { key: 'music_art', label: 'فنون / موسيقى', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>' },
+    { key: 'trophy', label: 'مراجعة نهائية / امتحانات', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>' },
+    { key: 'pen_tool', label: 'تعبير / بلاغة', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>' },
+    { key: 'chart_pie', label: 'إحصاء / بيانات', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>' }
+];
+
+const FOLDER_LEVEL_SVGS = {
+    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+    unit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="M8 10h8"/><path d="M8 14h5"/></svg>',
+    lesson: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>'
+};
+
+function getSubjectSvgMarkup(subjectName) {
+    const savedKey = appState.subjectIcons && appState.subjectIcons[subjectName];
+    if (savedKey) {
+        const found = SUBJECT_SVG_ICONS.find(i => i.key === savedKey);
+        if (found) return found.svg;
+    }
+    // Smart auto-detection based on Arabic/English subject keywords (only when user hasn't picked one yet)
+    const s = String(subjectName || '').toLowerCase();
+    let autoKey = 'folder';
+    if (s.includes('فيزي') || s.includes('phys')) autoKey = 'atom';
+    else if (s.includes('كيمي') || s.includes('chem')) autoKey = 'flask';
+    else if (s.includes('أحياء') || s.includes('احياء') || s.includes('بيولوج') || s.includes('bio')) autoKey = 'dna';
+    else if (s.includes('رياض') || s.includes('جبر') || s.includes('math')) autoKey = 'calculator';
+    else if (s.includes('هندس') || s.includes('استاتيك') || s.includes('ديناميك')) autoKey = 'compass';
+    else if (s.includes('تفاضل') || s.includes('تكامل')) autoKey = 'sigma';
+    else if (s.includes('عرب') || s.includes('نحو') || s.includes('بلاغ') || s.includes('أدب')) autoKey = 'feather';
+    else if (s.includes('انجليز') || s.includes('إنجليز') || s.includes('فرنس') || s.includes('ألمان') || s.includes('ايطال') || s.includes('english') || s.includes('french')) autoKey = 'languages';
+    else if (s.includes('جغرافي') || s.includes('geog')) autoKey = 'globe';
+    else if (s.includes('تاريخ') || s.includes('hist')) autoKey = 'landmark';
+    else if (s.includes('فلسف') || s.includes('نفس') || s.includes('اجتماع')) autoKey = 'brain';
+    else if (s.includes('جيولوج') || s.includes('geol')) autoKey = 'layers';
+    else if (s.includes('حاسب') || s.includes('برمج') || s.includes('كمبيوتر')) autoKey = 'cpu';
+    else if (s.includes('إحصاء') || s.includes('احصاء')) autoKey = 'chart_pie';
+
+    const matched = SUBJECT_SVG_ICONS.find(i => i.key === autoKey) || SUBJECT_SVG_ICONS[0];
+    return matched.svg;
+}
+
+function initHomeworksExplorerPage() {
+    folderNavState = { subject: null, book: null, chapter: null };
+    folderSelectionMode = false;
+    selectedExportHwIds.clear();
+    populateSubjectsDatalist();
+    updateSelectionToolbarUI();
+    renderFoldersExplorer();
+}
+
+function getValidHomeworksList() {
+    return appState.homeworks.filter(h => !h.id.startsWith('retry_'));
+}
+
+function navigateFolderTo(subject = null, book = null, chapter = null) {
+    folderNavState = { subject, book, chapter };
+    renderFoldersExplorer();
+}
+
+function navigateFolderUp() {
+    if (folderNavState.chapter !== null) {
+        folderNavState.chapter = null;
+    } else if (folderNavState.book !== null) {
+        folderNavState.book = null;
+    } else if (folderNavState.subject !== null) {
+        folderNavState.subject = null;
+    }
+    renderFoldersExplorer();
+}
+
+function renderFoldersBreadcrumb() {
+    const bc = document.getElementById('folders-breadcrumb');
+    const backBtn = document.getElementById('folders-back-btn');
+    if (!bc) return;
+
+    const { subject, book, chapter } = folderNavState;
+    if (backBtn) {
+        backBtn.classList.toggle('hidden', subject === null);
+    }
+
+    const parts = [];
+    parts.push(`
+        <button type="button" onclick="navigateFolderTo(null, null, null)" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors ${subject === null ? 'bg-blue-900 text-white' : 'text-blue-900 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50'}">
+            <i class="ph-bold ph-folders text-base"></i>
+            <span>كل المواد</span>
+        </button>
+    `);
+
+    if (subject !== null) {
+        parts.push(`<i class="ph-bold ph-caret-left text-slate-400"></i>`);
+        parts.push(`
+            <button type="button" onclick="navigateFolderTo('${escapeJsArg(subject)}', null, null)" class="px-2.5 py-1 rounded-lg transition-colors ${book === null ? 'bg-blue-900 text-white' : 'text-blue-900 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50'}">
+                ${escapeHtml(subject)}
+            </button>
+        `);
+    }
+
+    if (book !== null) {
+        parts.push(`<i class="ph-bold ph-caret-left text-slate-400"></i>`);
+        parts.push(`
+            <button type="button" onclick="navigateFolderTo('${escapeJsArg(subject)}', '${escapeJsArg(book)}', null)" class="px-2.5 py-1 rounded-lg transition-colors ${chapter === null ? 'bg-blue-900 text-white' : 'text-blue-900 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50'}">
+                ${escapeHtml(book)}
+            </button>
+        `);
+    }
+
+    if (chapter !== null) {
+        parts.push(`<i class="ph-bold ph-caret-left text-slate-400"></i>`);
+        parts.push(`
+            <span class="px-2.5 py-1 rounded-lg bg-blue-900 text-white">
+                ${escapeHtml(chapter)}
+            </span>
+        `);
+    }
+
+    bc.innerHTML = parts.join('');
+}
+
+function renderFoldersExplorer() {
+    const grid = document.getElementById('folders-explorer-grid');
+    const totalCountEl = document.getElementById('hw-explorer-total-count');
+    if (!grid) return;
+
+    const allHws = getValidHomeworksList();
+    if (totalCountEl) {
+        totalCountEl.textContent = `${allHws.length} واجب مسجل`;
+    }
+
+    renderFoldersBreadcrumb();
+    updateSelectionToolbarUI();
+
+    if (allHws.length === 0) {
+        grid.className = 'grid grid-cols-1 gap-4';
+        grid.innerHTML = `
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-10 text-center border border-slate-200 dark:border-slate-800 space-y-3">
+                <div class="w-16 h-16 rounded-2xl bg-blue-900/10 text-blue-900 dark:text-blue-400 flex items-center justify-center mx-auto">
+                    ${SUBJECT_SVG_ICONS[0].svg}
+                </div>
+                <h3 class="font-black text-lg">مفيش أي واجبات مضافة لسه!</h3>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                    المجلدات هنا بتتعمل تلقائياً من واجباتك الحقيقية! ارفع أول ملف إجابات أو أنشئ واجب يدوي من الصفحة الرئيسية وهتلاقي مواده ومصادره ووحداته ظهرت هنا فوراً.
+                </p>
+                <div class="pt-2">
+                    <button type="button" onclick="navigateTo('home')" class="px-6 py-3 rounded-2xl bg-blue-900 hover:bg-blue-800 text-white font-extrabold text-sm shadow-md inline-flex items-center gap-2">
+                        <i class="ph-bold ph-plus-circle text-lg"></i>
+                        <span>إضافة أول واجب الآن</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const { subject, book, chapter } = folderNavState;
+
+    // LEVEL 1: SUBJECTS FOLDERS
+    if (subject === null) {
+        const subjectsMap = {};
+        allHws.forEach(hw => {
+            if (!subjectsMap[hw.subject]) subjectsMap[hw.subject] = [];
+            subjectsMap[hw.subject].push(hw);
+        });
+
+        grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+        grid.innerHTML = Object.entries(subjectsMap).map(([subjName, hws]) => {
+            const booksCount = new Set(hws.map(h => h.book)).size;
+            const ids = hws.map(h => h.id);
+            const allSelected = ids.length > 0 && ids.every(id => selectedExportHwIds.has(id));
+            const someSelected = !allSelected && ids.some(id => selectedExportHwIds.has(id));
+
+            return `
+                <div onclick="handleFolderCardClick(event, 'subject', '${escapeJsArg(subjName)}')" class="cursor-pointer group relative bg-white dark:bg-slate-900 rounded-3xl p-5 border-2 ${allSelected ? 'border-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/20' : someSelected ? 'border-amber-400' : 'border-slate-200 dark:border-slate-800 hover:border-blue-800 dark:hover:border-blue-500'} shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-900/10 dark:bg-blue-500/15 text-blue-900 dark:text-blue-300 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            ${getSubjectSvgMarkup(subjName)}
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            ${folderSelectionMode ? `
+                                <button type="button" onclick="event.stopPropagation(); toggleGroupSelection('subject', '${escapeJsArg(subjName)}')" class="w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-colors ${allSelected ? 'bg-emerald-600 border-emerald-600 text-white' : someSelected ? 'bg-amber-500 border-amber-500 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'}" title="تحديد كل واجبات المادة">
+                                    <i class="ph-bold ${allSelected ? 'ph-check' : someSelected ? 'ph-minus' : ''}"></i>
+                                </button>
+                            ` : ''}
+                            <button type="button" onclick="event.stopPropagation(); openSubjectIconPicker('${escapeJsArg(subjName)}')" class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-100 dark:bg-slate-800 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-300 hover:text-blue-900 dark:hover:text-blue-300 text-[11px] font-bold flex items-center gap-1 transition-colors" title="تغيير أيقونة المادة">
+                                <i class="ph-bold ph-sparkle"></i>
+                                <span>الأيقونة</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-black text-lg text-slate-900 dark:text-white group-hover:text-blue-900 dark:group-hover:text-blue-400 transition-colors">${escapeHtml(subjName)}</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                            <span>${booksCount} مصدر / كتاب</span>
+                            <span>•</span>
+                            <span>${hws.length} واجب</span>
+                        </p>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-extrabold text-blue-900 dark:text-blue-400">
+                        <span>فتح مجلد المادة</span>
+                        <i class="ph-bold ph-arrow-left text-base group-hover:-translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        return;
+    }
+
+    // LEVEL 2: BOOKS / SOURCES INSIDE SUBJECT
+    const subjectHws = allHws.filter(h => h.subject === subject);
+    if (book === null) {
+        const booksMap = {};
+        subjectHws.forEach(hw => {
+            if (!booksMap[hw.book]) booksMap[hw.book] = [];
+            booksMap[hw.book].push(hw);
+        });
+
+        grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+        grid.innerHTML = Object.entries(booksMap).map(([bookName, hws]) => {
+            const unitsCount = new Set(hws.map(h => h.chapter)).size;
+            const ids = hws.map(h => h.id);
+            const allSelected = ids.length > 0 && ids.every(id => selectedExportHwIds.has(id));
+            const someSelected = !allSelected && ids.some(id => selectedExportHwIds.has(id));
+
+            return `
+                <div onclick="handleFolderCardClick(event, 'book', '${escapeJsArg(bookName)}')" class="cursor-pointer group relative bg-white dark:bg-slate-900 rounded-3xl p-5 border-2 ${allSelected ? 'border-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/20' : someSelected ? 'border-amber-400' : 'border-slate-200 dark:border-slate-800 hover:border-blue-800 dark:hover:border-blue-500'} shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            ${FOLDER_LEVEL_SVGS.book}
+                        </div>
+                        ${folderSelectionMode ? `
+                            <button type="button" onclick="event.stopPropagation(); toggleGroupSelection('book', '${escapeJsArg(bookName)}')" class="w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-colors ${allSelected ? 'bg-emerald-600 border-emerald-600 text-white' : someSelected ? 'bg-amber-500 border-amber-500 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'}" title="تحديد كل واجبات المصدر">
+                                <i class="ph-bold ${allSelected ? 'ph-check' : someSelected ? 'ph-minus' : ''}"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <div>
+                        <span class="text-[11px] font-bold text-indigo-700 dark:text-indigo-400">${escapeHtml(subject)}</span>
+                        <h3 class="font-black text-base sm:text-lg text-slate-900 dark:text-white mt-0.5 line-clamp-2">${escapeHtml(bookName)}</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                            <span>${unitsCount} وحدة / فصل</span>
+                            <span>•</span>
+                            <span>${hws.length} واجب</span>
+                        </p>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-extrabold text-indigo-700 dark:text-indigo-400">
+                        <span>عرض الوحدات</span>
+                        <i class="ph-bold ph-arrow-left text-base group-hover:-translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        return;
+    }
+
+    // LEVEL 3: CHAPTERS / UNITS INSIDE BOOK
+    const bookHws = subjectHws.filter(h => h.book === book);
+    if (chapter === null) {
+        const chaptersMap = {};
+        bookHws.forEach(hw => {
+            if (!chaptersMap[hw.chapter]) chaptersMap[hw.chapter] = [];
+            chaptersMap[hw.chapter].push(hw);
+        });
+
+        grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+        grid.innerHTML = Object.entries(chaptersMap).map(([chapName, hws]) => {
+            const ids = hws.map(h => h.id);
+            const allSelected = ids.length > 0 && ids.every(id => selectedExportHwIds.has(id));
+            const someSelected = !allSelected && ids.some(id => selectedExportHwIds.has(id));
+
+            return `
+                <div onclick="handleFolderCardClick(event, 'chapter', '${escapeJsArg(chapName)}')" class="cursor-pointer group relative bg-white dark:bg-slate-900 rounded-3xl p-5 border-2 ${allSelected ? 'border-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/20' : someSelected ? 'border-amber-400' : 'border-slate-200 dark:border-slate-800 hover:border-blue-800 dark:hover:border-blue-500'} shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            ${FOLDER_LEVEL_SVGS.unit}
+                        </div>
+                        ${folderSelectionMode ? `
+                            <button type="button" onclick="event.stopPropagation(); toggleGroupSelection('chapter', '${escapeJsArg(chapName)}')" class="w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-colors ${allSelected ? 'bg-emerald-600 border-emerald-600 text-white' : someSelected ? 'bg-amber-500 border-amber-500 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'}" title="تحديد كل واجبات الوحدة">
+                                <i class="ph-bold ${allSelected ? 'ph-check' : someSelected ? 'ph-minus' : ''}"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <div>
+                        <span class="text-[11px] font-bold text-amber-700 dark:text-amber-400">${escapeHtml(book)}</span>
+                        <h3 class="font-black text-base sm:text-lg text-slate-900 dark:text-white mt-0.5 line-clamp-2">${escapeHtml(chapName)}</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${hws.length} درس / واجب</p>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-extrabold text-amber-700 dark:text-amber-400">
+                        <span>عرض الدروس</span>
+                        <i class="ph-bold ph-arrow-left text-base group-hover:-translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        return;
+    }
+
+    // LEVEL 4: LESSONS / HOMEWORKS INSIDE UNIT
+    const lessonHws = bookHws.filter(h => h.chapter === chapter);
+    grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
+    grid.innerHTML = lessonHws.map(hw => {
+        const isSelected = selectedExportHwIds.has(hw.id);
+        let statusPill = '';
+        if (hw.status === 'in_progress') {
+            statusPill = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-100 text-blue-900 dark:bg-blue-900/50 dark:text-blue-300">محفوظ - قيد الحل</span>';
+        } else if (hw.status === 'partial') {
+            statusPill = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">مسلّم جزئياً (${hw.percentage}%)</span>`;
+        } else {
+            statusPill = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">مكتمل (${hw.percentage}%)</span>`;
+        }
+
+        return `
+            <div onclick="${folderSelectionMode ? `toggleSingleHomeworkSelection('${hw.id}')` : ''}" class="${folderSelectionMode ? 'cursor-pointer' : ''} bg-white dark:bg-slate-900 rounded-3xl p-5 border-2 ${isSelected ? 'border-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/20' : 'border-slate-200 dark:border-slate-800'} shadow-sm flex flex-col justify-between gap-4 transition-all">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
+                                ${FOLDER_LEVEL_SVGS.lesson}
+                            </div>
+                            ${statusPill}
+                        </div>
+                        ${folderSelectionMode ? `
+                            <button type="button" onclick="event.stopPropagation(); toggleSingleHomeworkSelection('${hw.id}')" class="w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-colors ${isSelected ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'}">
+                                <i class="ph-bold ${isSelected ? 'ph-check' : ''}"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <h4 class="font-black text-base sm:text-lg text-slate-900 dark:text-white">${escapeHtml(hw.lesson)}</h4>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${escapeHtml(hw.subject)} • ${escapeHtml(hw.book)}</p>
+                    <p class="text-[11px] text-slate-400 mt-2">${hw.questions.length} سؤال • ${hw.createdAt}</p>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2" onclick="event.stopPropagation()">
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="openSolveView('${hw.id}')" class="px-3 py-2 rounded-xl bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold flex items-center gap-1">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                            <span>${hw.status === 'completed' ? 'إعادة الحل' : 'حل'}</span>
+                        </button>
+                        ${hw.status !== 'in_progress' ? `
+                            <button type="button" onclick="openDashboardView('${hw.id}')" class="px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold">
+                                النتيجة
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <button type="button" onclick="openEditHomeworkMetaModal('${hw.id}')" class="p-2 rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40" title="تعديل بيانات التسليم">
+                            <i class="ph-bold ph-note-pencil text-base"></i>
+                        </button>
+                        <button type="button" onclick="shareHomeworkKey('${hw.id}')" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" title="مشاركة نموذج الإجابة">
+                            <i class="ph-bold ph-share-network text-base"></i>
+                        </button>
+                        <button type="button" onclick="deleteHomework('${hw.id}')" class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40" title="حذف الواجب">
+                            <i class="ph-bold ph-trash text-base"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function handleFolderCardClick(event, level, value) {
+    if (level === 'subject') {
+        navigateFolderTo(value, null, null);
+    } else if (level === 'book') {
+        navigateFolderTo(folderNavState.subject, value, null);
+    } else if (level === 'chapter') {
+        navigateFolderTo(folderNavState.subject, folderNavState.book, value);
+    }
+}
+
+// Selective Export Functions
+function toggleFolderSelectionMode() {
+    folderSelectionMode = !folderSelectionMode;
+    if (!folderSelectionMode) {
+        selectedExportHwIds.clear();
+    }
+    updateSelectionToolbarUI();
+    renderFoldersExplorer();
+}
+
+function updateSelectionToolbarUI() {
+    const toggleBtn = document.getElementById('toggle-select-mode-btn');
+    const toggleLabel = document.getElementById('toggle-select-mode-label');
+    const selectAllBtn = document.getElementById('select-all-current-btn');
+    const exportBtn = document.getElementById('export-selected-btn');
+    const countEl = document.getElementById('selected-export-count');
+    if (!toggleBtn) return;
+
+    if (folderSelectionMode) {
+        toggleBtn.className = 'px-4 py-2.5 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 transition-all';
+        toggleLabel.textContent = 'إلغاء التحديد';
+        selectAllBtn.classList.remove('hidden');
+        exportBtn.classList.remove('hidden');
+        countEl.textContent = selectedExportHwIds.size;
+    } else {
+        toggleBtn.className = 'px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 transition-all';
+        toggleLabel.textContent = 'تحديد للتصدير';
+        selectAllBtn.classList.add('hidden');
+        exportBtn.classList.add('hidden');
+    }
+}
+
+function toggleGroupSelection(level, value) {
+    const allHws = getValidHomeworksList();
+    let matching = [];
+    if (level === 'subject') {
+        matching = allHws.filter(h => h.subject === value);
+    } else if (level === 'book') {
+        matching = allHws.filter(h => h.subject === folderNavState.subject && h.book === value);
+    } else if (level === 'chapter') {
+        matching = allHws.filter(h => h.subject === folderNavState.subject && h.book === folderNavState.book && h.chapter === value);
+    }
+
+    const allAlreadySelected = matching.length > 0 && matching.every(h => selectedExportHwIds.has(h.id));
+    if (allAlreadySelected) {
+        matching.forEach(h => selectedExportHwIds.delete(h.id));
+    } else {
+        matching.forEach(h => selectedExportHwIds.add(h.id));
+    }
+    updateSelectionToolbarUI();
+    renderFoldersExplorer();
+}
+
+function toggleSingleHomeworkSelection(hwId) {
+    if (selectedExportHwIds.has(hwId)) {
+        selectedExportHwIds.delete(hwId);
+    } else {
+        selectedExportHwIds.add(hwId);
+    }
+    updateSelectionToolbarUI();
+    renderFoldersExplorer();
+}
+
+function selectAllInCurrentFolderView() {
+    const allHws = getValidHomeworksList();
+    const { subject, book, chapter } = folderNavState;
+    const scoped = allHws.filter(h => {
+        if (subject !== null && h.subject !== subject) return false;
+        if (book !== null && h.book !== book) return false;
+        if (chapter !== null && h.chapter !== chapter) return false;
+        return true;
+    });
+
+    const allSelected = scoped.length > 0 && scoped.every(h => selectedExportHwIds.has(h.id));
+    if (allSelected) {
+        scoped.forEach(h => selectedExportHwIds.delete(h.id));
+    } else {
+        scoped.forEach(h => selectedExportHwIds.add(h.id));
+    }
+    updateSelectionToolbarUI();
+    renderFoldersExplorer();
+}
+
+function exportSelectedHomeworks() {
+    if (selectedExportHwIds.size === 0) {
+        showToast('حدد مادة أو مصدر أو درس واحد على الأقل عشان تصدّره!', 'error');
+        return;
+    }
+
+    const selectedHws = getValidHomeworksList().filter(h => selectedExportHwIds.has(h.id));
+    const selectedSubjects = [...new Set(selectedHws.map(h => h.subject))];
+    const selectedIcons = {};
+    selectedSubjects.forEach(s => {
+        if (appState.subjectIcons && appState.subjectIcons[s]) {
+            selectedIcons[s] = appState.subjectIcons[s];
+        }
+    });
+
+    const exportPayload = {
+        exportedAt: new Date().toISOString(),
+        partialExport: true,
+        subjectIcons: selectedIcons,
+        homeworks: selectedHws
+    };
+
+    const labelPart = selectedSubjects.length === 1 ? `_${selectedSubjects[0].replace(/\s+/g, '_')}` : '_مختارات';
+    downloadJsonFile(exportPayload, `تصدير_واجبات${labelPart}_${selectedHws.length}واجب.json`);
+    showToast(`تم تصدير ${selectedHws.length} واجب بنجاح! تقدر تستوردهم من "نسخة احتياطية" في أي جهاز.`, 'success');
+}
+
+// Subject Icon Picker Functions
+function openSubjectIconPicker(subjectName) {
+    iconPickerTargetSubject = subjectName;
+    document.getElementById('icon-picker-subject-name').textContent = subjectName;
+    document.getElementById('icon-picker-preview-box').innerHTML = getSubjectSvgMarkup(subjectName);
+
+    const currentKey = (appState.subjectIcons && appState.subjectIcons[subjectName]) || '';
+    const gallery = document.getElementById('subject-icons-gallery');
+    gallery.innerHTML = SUBJECT_SVG_ICONS.map(item => {
+        const isCurrent = item.key === currentKey;
+        return `
+            <button type="button" onclick="selectSubjectSvgIcon('${item.key}')" class="p-3 rounded-2xl border-2 ${isCurrent ? 'border-blue-900 bg-blue-50 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300' : 'border-slate-200 dark:border-slate-700 hover:border-blue-700 text-slate-700 dark:text-slate-200'} flex flex-col items-center justify-center gap-1.5 text-center transition-all active:scale-95">
+                ${item.svg}
+                <span class="text-[10px] font-bold leading-tight line-clamp-1">${item.label}</span>
+            </button>
+        `;
+    }).join('');
+
+    openModal('subject-icon-modal');
+}
+
+function selectSubjectSvgIcon(iconKey) {
+    if (!iconPickerTargetSubject) return;
+    if (!appState.subjectIcons) appState.subjectIcons = {};
+    appState.subjectIcons[iconPickerTargetSubject] = iconKey;
+    persistState();
+    closeModal('subject-icon-modal');
+    renderFoldersExplorer();
+    showToast(`تم تحديث أيقونة مادة "${iconPickerTargetSubject}" بنجاح!`, 'success');
+}
+
+function escapeJsArg(str) {
+    return String(str ?? '')
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '&quot;');
 }
 
 window.addEventListener('DOMContentLoaded', initApp);
