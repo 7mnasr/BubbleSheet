@@ -2987,10 +2987,4 @@ function escapeJsArg(str) {
         .replace(/"/g, '&quot;');
 }
 
-function clearUserDataAndReset() {
-    if (confirm('هل أنت متأكد من حذف جميع بياناتك وواجباتك وإعادة ضبط الموقع؟ لا يمكن التراجع عن هذا الإجراء.')) {
-        localStorage.clear();
-        location.reload();
-    }
-}
 window.addEventListener('DOMContentLoaded', initApp);
