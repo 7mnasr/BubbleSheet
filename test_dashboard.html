@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>نتيجة الاختبار وتحليل الأخطاء | البابل شيت الذكي</title>
+    <!-- Favicon & Home Screen App Icon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231e3a8a'/%3E%3Cstop offset='100%25' stop-color='%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='14' y='16' width='14' height='14' rx='4' fill='none' stroke='%23ffffff' stroke-width='3.5'/%3E%3Cpath d='M17.5 23l3 3 5.5-6' fill='none' stroke='%2334d399' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='34' y1='23' x2='50' y2='23' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Crect x='14' y='36' width='14' height='14' rx='4' fill='none' stroke='%23ffffff' stroke-width='3.5'/%3E%3Cpath d='M17.5 43l3 3 5.5-6' fill='none' stroke='%2334d399' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='34' y1='43' x2='50' y2='43' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" id="apple-touch-icon-link" href="">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="البابل شيت الذكي">
+    <meta name="application-name" content="البابل شيت الذكي">
+    <meta name="theme-color" id="meta-theme-color" content="#1e3a8a">
+
+    <!-- Google Fonts: Cairo & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                        en: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#1e3a8a',
+                            900: '#172554',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="test_dashboard" class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION HEADER -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
+            <button onclick="navigateTo('tests')" class="flex items-center gap-2.5 text-right group focus:outline-none">
+                <div class="w-10 h-10 rounded-xl bg-blue-900 dark:bg-blue-700 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                    <i class="ph-bold ph-check-square-offset text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg leading-tight text-slate-900 dark:text-white">نتيجة الاختبار</h1>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">تحليلات الأخطاء والشرح التفصيلي</p>
+                </div>
+            </button>
+
+            <div class="flex items-center gap-2">
+                <button onclick="navigateTo('tests')" class="px-4 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5">
+                    <i class="ph-bold ph-arrow-right"></i>
+                    <span>العودة للاختبارات</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-8 space-y-6">
+        
+        <!-- Header Summary Card -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+                <span id="tdash-subject-tag" class="px-3 py-1 rounded-full text-xs font-extrabold bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-300">المادة</span>
+                <h2 id="tdash-title" class="text-xl sm:text-2xl font-black mt-1.5">نتيجة الاختبار التفاعلي</h2>
+                <p id="tdash-subtitle" class="text-xs text-slate-500 mt-0.5">التاريخ والتفاصيل</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-50 dark:bg-blue-950/60 px-5 py-3 rounded-2xl border border-blue-200 dark:border-blue-900 text-center">
+                    <span class="text-xs text-slate-500 block">الدرجة النهائية</span>
+                    <span id="tdash-score-fraction" class="text-2xl font-black text-blue-900 dark:text-blue-400">0 / 0</span>
+                </div>
+                <div class="bg-emerald-50 dark:bg-emerald-950/60 px-5 py-3 rounded-2xl border border-emerald-200 dark:border-emerald-900 text-center">
+                    <span class="text-xs text-slate-500 block">النسبة المئوية</span>
+                    <span id="tdash-score-percent" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Questions Review List -->
+        <div class="space-y-4">
+            <h3 class="font-extrabold text-lg">مراجعة الأسئلة والإجابات والشرح</h3>
+            <div id="tdash-questions-list" class="space-y-4">
+                <!-- Rendered dynamically -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- STANDARD MODALS & SCRIPTS -->
+    <div id="toast-container" class="fixed bottom-5 left-5 right-5 sm:left-auto sm:right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <script src="app.js"></script>
+</body>
+</html>
