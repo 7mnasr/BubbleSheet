@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>الاختبارات والتدريبات الذكية | البابل شيت الذكي</title>
+    <!-- Favicon & Home Screen App Icon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%231e3a8a'/%3E%3Cstop offset='100%25' stop-color='%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='14' y='16' width='14' height='14' rx='4' fill='none' stroke='%23ffffff' stroke-width='3.5'/%3E%3Cpath d='M17.5 23l3 3 5.5-6' fill='none' stroke='%2334d399' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='34' y1='23' x2='50' y2='23' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Crect x='14' y='36' width='14' height='14' rx='4' fill='none' stroke='%23ffffff' stroke-width='3.5'/%3E%3Cpath d='M17.5 43l3 3 5.5-6' fill='none' stroke='%2334d399' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='34' y1='43' x2='50' y2='43' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" id="apple-touch-icon-link" href="">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="البابل شيت الذكي">
+    <meta name="application-name" content="البابل شيت الذكي">
+    <meta name="theme-color" id="meta-theme-color" content="#1e3a8a">
+
+    <!-- Google Fonts: Cairo & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                        en: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#1e3a8a',
+                            900: '#172554',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="tests" class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION HEADER -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
+            <button onclick="navigateTo('home')" class="flex items-center gap-2.5 text-right group focus:outline-none">
+                <div class="w-10 h-10 rounded-xl bg-blue-900 dark:bg-blue-700 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                    <i class="ph-bold ph-check-square-offset text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg leading-tight text-slate-900 dark:text-white">البابل شيت الذكي</h1>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">تصحيح فوري وتحليل ذكي لأخطائك</p>
+                </div>
+            </button>
+
+            <div class="flex items-center gap-1.5 sm:gap-2.5">
+                <button onclick="openProfileSettingsModal()" id="header-user-pill" class="px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 transition-colors" title="ملفي الشخصي والألوان">
+                    <i id="header-user-icon" class="ph-fill ph-user-circle text-lg text-blue-900 dark:text-blue-400"></i>
+                    <span id="header-user-name" class="max-w-[85px] sm:max-w-[120px] truncate">حسابي</span>
+                </button>
+                <button onclick="navigateTo('home')" id="nav-home-btn" class="px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                    <i class="ph-bold ph-house text-lg"></i>
+                    <span class="hidden md:inline">الرئيسية</span>
+                </button>
+                <button onclick="navigateTo('tests')" id="nav-tests-btn" class="px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors bg-blue-50 text-blue-900 dark:bg-blue-950/60 dark:text-blue-300">
+                    <i class="ph-bold ph-exam text-lg text-blue-700 dark:text-blue-400"></i>
+                    <span>الاختبارات</span>
+                </button>
+                <button onclick="navigateTo('homeworks')" id="nav-homeworks-btn" class="px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                    <i class="ph-bold ph-folders text-lg"></i>
+                    <span>واجباتي</span>
+                </button>
+                <button onclick="navigateTo('mistakes')" id="nav-mistakes-btn" class="relative px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                    <i class="ph-bold ph-warning-circle text-lg text-rose-500"></i>
+                    <span>أخطائي</span>
+                    <span id="mistakes-badge" class="bg-rose-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                </button>
+                <button onclick="toggleTheme()" class="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-colors" title="تغيير المظهر">
+                    <i id="theme-icon" class="ph-bold ph-moon text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-8 space-y-6">
+
+        <!-- VIEW A: TESTS HUB (List & Upload Test JSON) -->
+        <div id="tests-hub-view" class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-900 dark:bg-indigo-900/40 dark:text-indigo-300 mb-2">
+                        <i class="ph-fill ph-exam"></i> أسئلة بنصوصها واختياراتها ورسوماتها
+                    </span>
+                    <h2 class="text-xl sm:text-2xl font-black">بنك الاختبارات والتدريبات التفاعلية</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        حل اختبارات حقيقية تحتوي على نص السؤال، الاختيارات مكتوبة، قطع القراءة، الجداول والرسومات البيانية.
+                    </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                    <button onclick="openTestAiPromptModal()" class="px-4 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all">
+                        <i class="ph-bold ph-magic-wand text-lg"></i>
+                        <span>برومت استخراج الاختبار (JSON)</span>
+                    </button>
+                    <button onclick="loadDemoTest()" class="px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all">
+                        <i class="ph-bold ph-play-circle text-lg"></i>
+                        <span>اختبار تجريبي جاهز</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Upload Box -->
+            <label id="test-drop-zone" class="cursor-pointer group flex flex-col items-center justify-center border-2 border-dashed border-indigo-300 dark:border-indigo-700 hover:border-indigo-600 rounded-3xl p-8 bg-indigo-50/40 dark:bg-indigo-950/20 transition-all text-center shadow-sm">
+                <input type="file" id="test-json-file-input" accept=".json,application/json" class="hidden" onchange="handleTestFileUpload(event)">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-md">
+                    <i class="ph-bold ph-file-arrow-up text-2xl"></i>
+                </div>
+                <span class="font-extrabold text-base sm:text-lg text-slate-800 dark:text-slate-100">ارفع ملف اختبار جديد (.json)</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 mt-1">اسحب ملف الاختبار هنا أو اضغط للاختيار من جهازك</span>
+            </label>
+
+            <!-- Tests Archive List -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-extrabold flex items-center gap-2">
+                    <i class="ph-bold ph-books text-indigo-700 dark:text-indigo-400 text-2xl"></i>
+                    اختباراتي وتدريباتي المحفوظة
+                </h3>
+                <div id="tests-archive-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW B: SOLVING TEST INTERFACE (Hidden by default) -->
+        <div id="test-solve-view" class="hidden space-y-6">
+            <!-- Top Solve Header -->
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <span id="test-solve-subject" class="text-xs font-extrabold px-3 py-1 rounded-full bg-indigo-100 text-indigo-900 dark:bg-indigo-900/50 dark:text-indigo-300">المادة</span>
+                    <h2 id="test-solve-title" class="text-lg sm:text-xl font-black mt-1">عنوان الاختبار</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="test-solve-progress-text" class="text-xs font-bold text-slate-500">سؤال 1 من 10</span>
+                    <button type="button" onclick="exitTestSolve()" class="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold hover:bg-rose-100 hover:text-rose-600">إنهاء وحفظ</button>
+                </div>
+            </div>
+
+            <!-- Main Question Card with Full Text, Options & Passages -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Question Area (8 cols) -->
+                <div class="lg:col-span-8 space-y-5">
+                    
+                    <!-- Reading Passage / Context Box (if any) -->
+                    <div id="test-passage-box" class="hidden p-5 rounded-3xl bg-amber-50/80 dark:bg-amber-950/30 border-2 border-amber-300 dark:border-amber-800 space-y-2">
+                        <span class="text-xs font-extrabold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                            <i class="ph-bold ph-book-open-text text-base"></i> قطعة قراءة / نص مرجعي للإجابة:
+                        </span>
+                        <p id="test-passage-text" class="text-xs sm:text-sm leading-relaxed text-slate-800 dark:text-slate-200 whitespace-pre-line"></p>
+                    </div>
+
+                    <!-- Question Text & Image Box -->
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between gap-2">
+                            <span id="test-q-number-badge" class="px-3.5 py-1.5 rounded-xl bg-blue-900 text-white font-black text-sm">سؤال 1</span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="toggleTestFlag()" id="test-flag-btn" class="px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                                    <i id="test-flag-icon" class="ph-bold ph-flag"></i> علامة مراجعة
+                                </button>
+                                <span id="test-q-type-badge" class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800">اختيار من متعدد</span>
+                            </div>
+                        </div>
+
+                        <!-- Question Text -->
+                        <p id="test-q-text" class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 leading-relaxed whitespace-pre-line"></p>
+
+                        <!-- Question Image / Chart / Graph (if any) -->
+                        <div id="test-q-img-wrap" class="hidden pt-2">
+                            <img id="test-q-img" src="" alt="صورة أو رسم بياني للسؤال" onclick="openImageLightbox(this.src)" class="max-h-72 rounded-2xl border border-slate-300 dark:border-slate-700 cursor-zoom-in object-contain bg-white mx-auto">
+                        </div>
+                    </div>
+
+                    <!-- Options Container (MCQ or Essay) -->
+                    <div id="test-options-container" class="space-y-3">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <!-- Essay Answer Box (Hidden if MCQ) -->
+                    <div id="test-essay-container" class="hidden bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                        <h4 class="font-extrabold text-sm text-slate-700 dark:text-slate-300">اكتب إجابتك المقالية هنا:</h4>
+                        <textarea id="test-essay-input" rows="4" oninput="saveTestEssayInput(this.value)" placeholder="اكتب إجابتك بالتفصيل..." class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold focus:border-indigo-600 focus:outline-none"></textarea>
+                        <div id="test-essay-model-wrap" class="hidden pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                            <span class="text-xs font-extrabold text-emerald-700 dark:text-emerald-400">الإجابة النموذجية للتقييم الذاتي:</span>
+                            <p id="test-essay-model-text" class="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 text-xs sm:text-sm font-semibold"></p>
+                            <div class="flex items-center gap-2 pt-2">
+                                <span class="text-xs font-bold">قيم إجابتك:</span>
+                                <button type="button" onclick="gradeTestEssay(0)" class="test-essay-grade-btn px-3 py-1.5 rounded-lg text-xs font-bold border">0 (خطأ)</button>
+                                <button type="button" onclick="gradeTestEssay(1)" class="test-essay-grade-btn px-3 py-1.5 rounded-lg text-xs font-bold border">1 (جزئي)</button>
+                                <button type="button" onclick="gradeTestEssay(2)" class="test-essay-grade-btn px-3 py-1.5 rounded-lg text-xs font-bold border">2 (صح تماماً)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Bar Buttons -->
+                    <div class="flex items-center justify-between pt-2">
+                        <button type="button" onclick="prevTestQuestion()" id="test-prev-btn" class="px-5 py-3 rounded-2xl bg-slate-200 dark:bg-slate-800 font-extrabold text-xs sm:text-sm disabled:opacity-40 flex items-center gap-1.5">
+                            <i class="ph-bold ph-arrow-right"></i> السابق
+                        </button>
+                        <button type="button" onclick="nextTestQuestion()" id="test-next-btn" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center gap-1.5">
+                            <span>التالي</span> <i class="ph-bold ph-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question Map Grid Sidebar (4 cols) -->
+                <div class="lg:col-span-4 bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 sticky top-20">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <h4 class="font-black text-sm">خريطة أسئلة الاختبار</h4>
+                        <span id="test-map-ratio" class="text-xs font-bold text-indigo-600">0 / 0</span>
+                    </div>
+
+                    <div id="test-map-grid" class="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto custom-scroll p-1">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <button type="button" onclick="initiateSubmitTest()" class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95">
+                            <i class="ph-bold ph-paper-plane-tilt text-lg"></i>
+                            <span>تسليم الاختبار وعرض النتيجة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW C: TEST RESULTS & ERROR ANALYSIS DASHBOARD -->
+        <div id="test-results-view" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">نتيجة الاختبار مصححة ✅</span>
+                    <h2 id="res-test-title" class="text-xl sm:text-2xl font-black mt-1">تقرير نتيجة الاختبار</h2>
+                    <p id="res-test-subtitle" class="text-xs sm:text-sm text-slate-500">تم تحليل إجاباتك وعرض التوضيحات النموذجية لكل سؤال</p>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <button onclick="navigateTo('tests')" class="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow">
+                        العودة لبنك الاختبارات
+                    </button>
+                </div>
+            </div>
+
+            <!-- Score Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <span class="text-xs font-bold text-slate-500 block mb-1">الدرجة النهائية</span>
+                    <div class="flex items-baseline gap-2">
+                        <span id="res-score-fraction" class="text-3xl font-black text-indigo-600">0 / 0</span>
+                        <span id="res-score-percent" class="text-sm font-extrabold px-2.5 py-0.5 rounded-lg bg-indigo-50 text-indigo-800">0%</span>
+                    </div>
+                </div>
+                <div class="bg-emerald-50/70 dark:bg-emerald-950/20 rounded-2xl p-5 border border-emerald-200 dark:border-emerald-900/50">
+                    <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400 block mb-1">إجابات صحيحة</span>
+                    <span id="res-correct-count" class="text-3xl font-black text-emerald-600">0</span>
+                </div>
+                <div class="bg-rose-50/70 dark:bg-rose-950/20 rounded-2xl p-5 border border-rose-200 dark:border-rose-900/50">
+                    <span class="text-xs font-bold text-rose-700 dark:text-rose-400 block mb-1">إجابات خاطئة</span>
+                    <span id="res-wrong-count" class="text-3xl font-black text-rose-600">0</span>
+                </div>
+            </div>
+
+            <!-- Detailed Review Questions List -->
+            <div id="res-questions-review-list" class="space-y-4">
+                <!-- Rendered dynamically with explanations -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL: TEST AI PROMPT GENERATOR ("برومت الاختبارات") -->
+    <div id="test-ai-prompt-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-5 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-2xl max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                        <i class="ph-bold ph-robot text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-base sm:text-lg">برومت استخراج اختبار تفاعلي (JSON)</h3>
+                        <p class="text-xs text-slate-500">انسخ هذا البرومت وابعته لـ Gemini مع صور الامتحان أو الكتاب</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('test-ai-prompt-modal')" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <div class="my-4 overflow-y-auto custom-scroll space-y-3 flex-1">
+                <div class="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-xs text-indigo-900 dark:text-indigo-200 leading-relaxed">
+                    <strong>التعليمات:</strong> ارفع صور الاختبار أو الأسئلة لـ Gemini، الصق هذا البرومت معه، وحمل ملف الـ JSON الناتج وارفعه في صفحة الاختبارات مباشرة!
+                </div>
+                <textarea id="test-ai-prompt-text" readonly rows="11" class="w-full p-4 rounded-2xl bg-slate-900 text-emerald-300 font-en text-xs leading-relaxed border border-slate-700 focus:outline-none">You are an expert educational AI assistant. Extract EVERY question from the attached exam images or text into a valid JSON object matching this exact schema. Do NOT include markdown explanations outside the JSON block.
+
+Schema:
+{
+  "title": "اسم الاختبار أو الدرس",
+  "subject": "المادة الدراسية",
+  "book": "اسم الكتاب أو المصدر",
+  "passage": "قطعة قراءة أو نص مرجعي مشترك إذا وجد (اتركه فارغاً إن لم يوجد)",
+  "questions": [
+    {
+      "number": "1",
+      "type": "mcq", // "mcq" or "essay"
+      "questionText": "نص السؤال كاملاً كما هو في الامتحان",
+      "passage": "قطعة تخص هذا السؤال إن وجدت",
+      "options": {
+        "A": "نص الاختيار الأول",
+        "B": "نص الاختيار الثاني",
+        "C": "نص الاختيار الثالث",
+        "D": "نص الاختيار الرابع"
+      },
+      "answer": "B", // الحرف الصحيح A أو B أو C أو D، أو الإجابة المقالية النموذجية
+      "explanation": "شرح وتوضيح سبب الإجابة الصحيحة"
+    }
+  ]
+}
+
+Rules:
+1. Preserve exact question text, options text, and numbering.
+2. Return ONLY valid JSON.</textarea>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                <button onclick="closeModal('test-ai-prompt-modal')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">إغلاق</button>
+                <button onclick="copyTestAiPrompt()" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-md">
+                    <i class="ph-bold ph-copy text-lg"></i>
+                    <span>نسخ البرومت الآن</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARED MODALS (Profile, Lightbox, Toast) -->
+    <div id="image-lightbox-modal" onclick="closeModal('image-lightbox-modal')" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out">
+        <div class="relative max-w-4xl max-h-[90vh]">
+            <button onclick="closeModal('image-lightbox-modal')" class="absolute -top-10 left-0 text-white font-bold"><i class="ph-bold ph-x text-xl"></i> إغلاق</button>
+            <img id="lightbox-img-el" src="" alt="معاينة" class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain bg-white">
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 left-5 right-5 sm:left-auto sm:right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
