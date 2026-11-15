@@ -2987,4 +2987,808 @@ function escapeJsArg(str) {
         .replace(/"/g, '&quot;');
 }
 
+// =========================================================================
+// 1. STATE MANAGEMENT & LOCALSTORAGE PERSISTENCE (UPDATED FOR TESTS)
+// =========================================================================
+const STORAGE_KEY = 'smart_bubble_sheet_v1';
+const THEME_KEY = 'smart_bubble_sheet_theme';
+const TUTORIAL_DISMISSED_KEY = 'smart_bubble_sheet_tutorial_done';
+const COLOR_THEME_KEY = 'smart_bubble_sheet_color_theme';
+const ACTIVE_HW_KEY = 'smart_bubble_sheet_active_hw_id';
+const ACTIVE_TEST_KEY = 'smart_bubble_sheet_active_test_id';
+const RETRY_FLAG_KEY = 'smart_bubble_sheet_is_retry';
+
+let selectedInitTheme = 'blue';
+
+let appState = {
+    userProfile: null,
+    homeworks: [],
+    tests: [], // Array of Test Objects
+    subjectIcons: {},
+    solveMode: 'standard',
+};
+
+// Transient runtime state
+let pendingParsedQuestions = null;
+let pendingParsedLang = 'ar';
+let currentHomeworkId = null;
+let currentTestId = null;
+let currentQuestionIndex = 0;
+let currentTestQuestionIndex = 0;
+let hasUnsavedChanges = false;
+let dashboardFilter = 'all';
+let isRetrySession = false;
+let pendingTargetUrl = null;
+let pendingDeleteHwId = null;
+let pendingDeleteTestId = null;
+
+const ERROR_REASONS = [
+    'عوضت غلط',
+    'اخترت غلط سهواً',
+    'مش فاهم الفكرة',
+    'متلخبط / ناسي قاعدة'
+];
+
+function getCurrentPage() {
+    return document.body.dataset.page || 'home';
+}
+
+function initApp() {
+    initTheme();
+    generateHomeScreenAppIcon();
+
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+                appState.homeworks = Array.isArray(parsed.homeworks) ? parsed.homeworks : [];
+                appState.tests = Array.isArray(parsed.tests) ? parsed.tests : [];
+                appState.solveMode = parsed.solveMode || 'standard';
+                appState.userProfile = parsed.userProfile || null;
+                appState.subjectIcons = parsed.subjectIcons || {};
+            }
+        }
+    } catch (e) {
+        console.error('Error loading localStorage:', e);
+    }
+
+    const savedColor = (appState.userProfile && appState.userProfile.colorTheme)
+        || localStorage.getItem(COLOR_THEME_KEY)
+        || 'blue';
+    applyColorTheme(savedColor, false);
+
+    setupBeforeUnloadGuard();
+    updateGlobalStats();
+    applyUserPersonalization();
+
+    const page = getCurrentPage();
+    updateActiveNavHighlight(page);
+
+    if (page === 'home') {
+        setupDragAndDrop();
+        refreshAllUI();
+    } else if (page === 'homeworks') {
+        initHomeworksExplorerPage();
+    } else if (page === 'solve') {
+        setupKeyboardShortcuts();
+        initSolvePage();
+    } else if (page === 'dashboard') {
+        initDashboardPage();
+    } else if (page === 'mistakes') {
+        renderMistakesHub();
+    } else if (page === 'tests') {
+        renderTestsArchive();
+    } else if (page === 'test_solve') {
+        initTestSolvePage();
+    } else if (page === 'test_dashboard') {
+        initTestDashboardPage();
+    }
+
+    if (!appState.userProfile) {
+        showUserInitStep('ask');
+        openModal('user-init-modal');
+    } else if (page === 'home' && localStorage.getItem(TUTORIAL_DISMISSED_KEY) !== 'true') {
+        openTutorialFromStart();
+    }
+}
+
+function updateActiveNavHighlight(page) {
+    const homeBtn = document.getElementById('nav-home-btn');
+    const homeworksBtn = document.getElementById('nav-homeworks-btn');
+    const testsBtn = document.getElementById('nav-tests-btn');
+    const mistakesBtn = document.getElementById('nav-mistakes-btn');
+    if (!homeBtn || !mistakesBtn) return;
+
+    const inactiveBase = 'px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800';
+    homeBtn.className = inactiveBase;
+    if (homeworksBtn) homeworksBtn.className = inactiveBase;
+    if (testsBtn) testsBtn.className = inactiveBase;
+    mistakesBtn.className = 'relative ' + inactiveBase;
+
+    if (page === 'home') {
+        homeBtn.className = 'px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors bg-blue-50 text-blue-900 dark:bg-blue-950/60 dark:text-blue-300';
+    } else if (page === 'homeworks' && homeworksBtn) {
+        homeworksBtn.className = 'px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors bg-blue-50 text-blue-900 dark:bg-blue-950/60 dark:text-blue-300';
+    } else if (page === 'tests' && testsBtn) {
+        testsBtn.className = 'px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors bg-blue-50 text-blue-900 dark:bg-blue-950/60 dark:text-blue-300';
+    } else if (page === 'mistakes') {
+        mistakesBtn.className = 'relative px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors bg-rose-50 text-rose-900 dark:bg-rose-950/50 dark:text-rose-300';
+    }
+}
+
+function generateHomeScreenAppIcon() {
+    try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 180;
+        canvas.height = 180;
+        const ctx = canvas.getContext('2d');
+        const grad = ctx.createLinearGradient(0, 0, 180, 180);
+        grad.addColorStop(0, '#1e3a8a');
+        grad.addColorStop(1, '#3b82f6');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 180, 180, 40);
+        ctx.fill();
+        const link = document.getElementById('apple-touch-icon-link');
+        if (link) link.href = canvas.toDataURL('image/png');
+    } catch (e) {}
+}
+
+function applyColorTheme(themeName, saveToProfile = false) {
+    const validThemes = ['blue', 'pink', 'green', 'red', 'purple'];
+    const theme = validThemes.includes(themeName) ? themeName : 'blue';
+    document.documentElement.setAttribute('data-color-theme', theme);
+    localStorage.setItem(COLOR_THEME_KEY, theme);
+    if (saveToProfile && appState.userProfile) {
+        appState.userProfile.colorTheme = theme;
+        persistState();
+    }
+}
+
+function showUserInitStep(step) {
+    ['ask', 'restore', 'new'].forEach(s => {
+        const el = document.getElementById(`user-init-step-${s}`);
+        if (el) el.classList.toggle('hidden', s !== step);
+    });
+}
+
+function suggestThemeByGender(gender) {
+    if (gender === 'female') selectInitColorTheme('pink');
+    else selectInitColorTheme('blue');
+}
+
+function selectInitColorTheme(themeName) {
+    selectedInitTheme = themeName;
+    applyColorTheme(themeName, false);
+}
+
+function saveNewUserProfile(e) {
+    e.preventDefault();
+    const name = document.getElementById('init-user-name').value.trim();
+    const genderEl = document.querySelector('input[name="init-gender"]:checked');
+    if (!name || !genderEl) return;
+    appState.userProfile = {
+        name,
+        gender: genderEl.value,
+        colorTheme: selectedInitTheme,
+        createdAt: new Date().toISOString()
+    };
+    applyColorTheme(selectedInitTheme, true);
+    persistState();
+    applyUserPersonalization();
+    closeModal('user-init-modal');
+    showToast(`نورت الموقع يا ${name}! تم تجهيز ملفك بنجاح.`, 'success');
+}
+
+function handleInitialBackupRestore(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!data) throw new Error('Invalid backup');
+            appState.homeworks = Array.isArray(data.homeworks) ? data.homeworks : [];
+            appState.tests = Array.isArray(data.tests) ? data.tests : [];
+            appState.solveMode = data.solveMode || 'standard';
+            appState.subjectIcons = data.subjectIcons || {};
+            appState.userProfile = data.userProfile || appState.userProfile;
+            applyColorTheme(appState.userProfile?.colorTheme || 'blue', true);
+            persistState();
+            refreshAllUI();
+            closeModal('user-init-modal');
+            showToast('تم استرجاع كل بياناتك بنجاح!', 'success');
+        } catch (err) {
+            showToast('ملف النسخة الاحتياطية غير سليم!', 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function applyUserPersonalization() {
+    const profile = appState.userProfile;
+    const nameEl = document.getElementById('header-user-name');
+    if (!profile) return;
+    if (nameEl) nameEl.textContent = profile.name;
+}
+
+function openProfileSettingsModal() {
+    const profile = appState.userProfile || { name: '', gender: 'male', colorTheme: 'blue' };
+    const nameInput = document.getElementById('edit-user-name');
+    if (nameInput) nameInput.value = profile.name || '';
+    openModal('profile-settings-modal');
+}
+
+function updateExistingUserProfile(e) {
+    e.preventDefault();
+    const name = document.getElementById('edit-user-name').value.trim();
+    const genderEl = document.querySelector('input[name="edit-gender"]:checked');
+    if (!name) return;
+    appState.userProfile = {
+        ...(appState.userProfile || {}),
+        name,
+        gender: genderEl ? genderEl.value : 'male'
+    };
+    persistState();
+    applyUserPersonalization();
+    closeModal('profile-settings-modal');
+    showToast('تم حفظ بياناتك بنجاح!', 'success');
+}
+
+function persistState() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    } catch (e) {
+        showToast('ذاكرة المتصفح ممتلئة! حاول تصدير نسخة احتياطية.', 'error');
+    }
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+}
+
+function toggleTheme() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+}
+
+// ROUTER
+const PAGE_ROUTES = {
+    home: 'index.html',
+    homeworks: 'homeworks.html',
+    solve: 'solve.html',
+    dashboard: 'dashboard.html',
+    mistakes: 'mistakes.html',
+    tests: 'tests.html',
+    test_solve: 'test_solve.html',
+    test_dashboard: 'test_dashboard.html'
+};
+
+function navigateTo(viewName) {
+    const targetUrl = PAGE_ROUTES[viewName] || 'index.html';
+    window.location.href = targetUrl;
+}
+
+function setupBeforeUnloadGuard() {
+    window.addEventListener('beforeunload', (e) => {
+        if (hasUnsavedChanges) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+}
+
+// =========================================================================
+// TESTS MODULE (NEW FEATURE)
+// =========================================================================
+function openTestAiPromptModal() {
+    openModal('test-ai-prompt-modal');
+}
+
+function copyTestAiPrompt() {
+    const textarea = document.getElementById('test-ai-prompt-text');
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        showToast('تم نسخ برومت الاختبار بنجاح!', 'success');
+        closeModal('test-ai-prompt-modal');
+    } catch (err) {
+        showToast('تعذر النسخ التلقائي.', 'error');
+    }
+}
+
+function handleTestFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            let content = e.target.result.trim();
+            content = content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
+            const data = JSON.parse(content);
+
+            if (!data.questions || !Array.isArray(data.questions) || data.questions.length === 0) {
+                throw new Error('الملف لا يحتوي على أسئلة صحيحة.');
+            }
+
+            const normalizedQuestions = data.questions.map((q, idx) => ({
+                number: q.number ? String(q.number) : String(idx + 1),
+                type: q.type === 'essay' ? 'essay' : 'mcq',
+                passageText: q.passageText || '',
+                questionText: q.questionText || '',
+                questionImage: q.questionImage || '',
+                options: q.options || { "أ": "...", "ب": "...", "ج": "...", "د": "..." },
+                correctAnswer: String(q.answer || q.correctAnswer || '').trim(),
+                explanation: q.explanation || '',
+                userAnswer: null,
+                essayRevealed: false,
+                essayScore: null,
+                flagged: false,
+                status: 'unanswered',
+                errorReason: '',
+                understood: false,
+                note: ''
+            }));
+
+            const newTest = {
+                id: 'test_' + Date.now(),
+                title: data.title || 'اختبار تجريبي جديد',
+                subject: data.subject || 'عام',
+                book: data.book || 'مصدر خارجي',
+                chapter: data.chapter || 'الفصل الأول',
+                lesson: data.lesson || 'الدرس الأول',
+                language: data.language || 'ar',
+                createdAt: new Date().toLocaleDateString('ar-EG'),
+                status: 'in_progress',
+                questions: normalizedQuestions,
+                scoreEarned: 0,
+                scoreMax: 0,
+                percentage: 0
+            };
+
+            appState.tests.unshift(newTest);
+            persistState();
+            openTestSolveView(newTest.id);
+        } catch (err) {
+            showToast('صيغة ملف الـ JSON غير صحيحة!', 'error');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+function loadDemoTest() {
+    const demoTest = {
+        id: 'test_demo_' + Date.now(),
+        title: 'اختبار تجريبي شامل في الفيزياء الحديثة',
+        subject: 'الفيزياء',
+        book: 'كتاب الامتحان (تجريبي)',
+        chapter: 'الفصل الخامس',
+        lesson: 'ازدواجية الموجة والجسيم',
+        language: 'ar',
+        createdAt: new Date().toLocaleDateString('ar-EG'),
+        status: 'in_progress',
+        questions: [
+            {
+                number: '1',
+                type: 'mcq',
+                passageText: 'تعتبر ظاهرة انبعاث الإلكترونات من أسطح المعادن عند سقوط ضوء مناسب عليها بتردد معين باسم ظاهرة الانبعاث الكهروضوئي.',
+                questionText: 'أية من العلاقات التالية تعبر عن تردد الانعتاق (التردد الحرج) للمعدن؟',
+                questionImage: '',
+                options: {
+                    'أ': 'يساوي أقل تردد للضوء الساقط يكفي لتحرير الإلكترونات دون اكتسابها طاقة حركة',
+                    'ب': 'يعتمد على شدة الضوء الساقط فقط',
+                    'ج': 'يتناسب طردياً مع دالة الشغل للمعدن',
+                    'د': 'أ و ج معاً صحيحان'
+                },
+                correctAnswer: 'د',
+                explanation: 'تردد الانعتاق هو أقل تردد يلزم لتحرير الإلكترون.'
+            },
+            {
+                number: '2',
+                type: 'essay',
+                passageText: '',
+                questionText: 'اشرح بأسلوبك لماذا تفشل الفيزياء الكلاسيكية في تفسير ظاهرة إشعاع الجسم الأسود؟',
+                correctAnswer: 'لأن الفيزياء الكلاسيكية اعتبرت أن الطاقة تغير متصل (بشكل موجات) بينما بلانك فرض أن الطاقة تتوارد على دفعات تسمى كمات أو فوتونات.'
+            }
+        ].map(q => ({
+            ...q,
+            userAnswer: null,
+            essayRevealed: false,
+            essayScore: null,
+            flagged: false,
+            status: 'unanswered',
+            errorReason: '',
+            understood: false,
+            note: ''
+        })),
+        scoreEarned: 0,
+        scoreMax: 0,
+        percentage: 0
+    };
+
+    appState.tests.unshift(demoTest);
+    persistState();
+    openTestSolveView(demoTest.id);
+}
+
+function openTestSolveView(testId) {
+    localStorage.setItem(ACTIVE_TEST_KEY, testId);
+    window.location.href = 'test_solve.html';
+}
+
+function initTestSolvePage() {
+    const testId = localStorage.getItem(ACTIVE_TEST_KEY);
+    const test = appState.tests.find(t => t.id === testId);
+    if (!test) {
+        window.location.href = 'tests.html';
+        return;
+    }
+    currentTestId = testId;
+    currentTestQuestionIndex = 0;
+    hasUnsavedChanges = false;
+
+    document.getElementById('test-solve-title').textContent = test.title;
+    document.getElementById('test-solve-subject-badge').textContent = `${test.subject} • ${test.book}`;
+    renderCurrentTestQuestion();
+    renderTestQuestionMap();
+}
+
+function renderCurrentTestQuestion() {
+    const test = appState.tests.find(t => t.id === currentTestId);
+    if (!test) return;
+
+    const q = test.questions[currentTestQuestionIndex];
+    const total = test.questions.length;
+    const answeredCount = test.questions.filter(item => (item.type === 'mcq' && item.userAnswer) || (item.type === 'essay' && item.essayScore !== null)).length;
+
+    document.getElementById('test-solve-progress-text').textContent = `تم حل ${answeredCount} من ${total}`;
+    document.getElementById('test-map-answered-ratio').textContent = `${answeredCount} / ${total}`;
+
+    document.getElementById('tq-number-display').textContent = `سؤال ${q.number}`;
+    document.getElementById('tq-total-display').textContent = `(عنصر ${currentTestQuestionIndex + 1} من ${total})`;
+    document.getElementById('tq-type-badge').textContent = q.type === 'mcq' ? 'اختيار من متعدد' : 'سؤال مقالي';
+
+    // Passage box
+    const passageBox = document.getElementById('tq-passage-box');
+    const passageText = document.getElementById('tq-passage-text');
+    if (q.passageText && q.passageText.trim() !== '') {
+        passageBox.classList.remove('hidden');
+        passageText.textContent = q.passageText;
+    } else {
+        passageBox.classList.add('hidden');
+    }
+
+    document.getElementById('tq-text-el').textContent = q.questionText;
+
+    const imgWrap = document.getElementById('tq-img-wrap');
+    const imgEl = document.getElementById('tq-img-el');
+    if (q.questionImage && q.questionImage.trim() !== '') {
+        imgEl.src = q.questionImage;
+        imgWrap.classList.remove('hidden');
+    } else {
+        imgWrap.classList.add('hidden');
+    }
+
+    const flagBtn = document.getElementById('flag-test-q-btn');
+    const flagIcon = document.getElementById('flag-test-icon');
+    if (q.flagged) {
+        flagBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold border-2 border-amber-500 bg-amber-50 text-amber-700 flex items-center gap-1';
+        flagIcon.className = 'ph-fill ph-flag text-base text-amber-500';
+    } else {
+        flagBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 flex items-center gap-1';
+        flagIcon.className = 'ph-bold ph-flag text-base';
+    }
+
+    document.getElementById('prev-test-q-btn').disabled = (currentTestQuestionIndex === 0);
+    document.getElementById('next-test-q-btn').disabled = (currentTestQuestionIndex === total - 1);
+
+    const mcqCont = document.getElementById('tq-mcq-container');
+    const essayCont = document.getElementById('tq-essay-container');
+
+    if (q.type === 'mcq') {
+        mcqCont.classList.remove('hidden');
+        essayCont.classList.add('hidden');
+        renderTestMcqOptions(q);
+    } else {
+        mcqCont.classList.add('hidden');
+        essayCont.classList.remove('hidden');
+        renderTestEssayBox(q);
+    }
+}
+
+function renderTestMcqOptions(q) {
+    const grid = document.getElementById('tq-options-grid');
+    const optionsObj = q.options || {};
+
+    grid.innerHTML = Object.entries(optionsObj).map(([optKey, optText]) => {
+        const isSelected = (q.userAnswer === optKey);
+        const baseClasses = isSelected
+            ? 'border-blue-900 bg-blue-900 text-white shadow-md'
+            : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/50 hover:border-blue-700 text-slate-800 dark:text-slate-100';
+        const circleClasses = isSelected
+            ? 'bg-white text-blue-900 font-black'
+            : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 font-extrabold';
+
+        return `
+            <button type="button" onclick="selectTestMcqOption('${optKey}')" class="p-4 rounded-2xl border-2 transition-all flex items-start gap-3.5 text-start active:scale-95 ${baseClasses}">
+                <span class="w-9 h-9 rounded-full flex items-center justify-center text-base shrink-0 ${circleClasses}">
+                    ${optKey}
+                </span>
+                <div class="flex-1 pt-1">
+                    <span class="text-sm sm:text-base font-bold leading-relaxed block">${escapeHtml(optText)}</span>
+                </div>
+                ${isSelected ? '<i class="ph-fill ph-check-circle text-xl text-white shrink-0 mt-1"></i>' : ''}
+            </button>
+        `;
+    }).join('');
+}
+
+function selectTestMcqOption(optKey) {
+    const test = appState.tests.find(t => t.id === currentTestId);
+    if (!test) return;
+    test.questions[currentTestQuestionIndex].userAnswer = optKey;
+    hasUnsavedChanges = true;
+    renderCurrentTestQuestion();
+    renderTestQuestionMap();
+}
+
+function renderTestEssayBox(q) {
+    const inputEl = document.getElementById('tq-essay-user-input');
+    const modelWrap = document.getElementById('tq-essay-model-wrap');
+    const modelText = document.getElementById('tq-essay-model-text');
+    const revealBtn = document.getElementById('tq-essay-reveal-btn');
+
+    inputEl.value = q.note || ''; // using note for essay text answer temporarily or user input property
+    modelText.textContent = q.correctAnswer;
+
+    if (q.essayRevealed || q.essayScore !== null) {
+        modelWrap.classList.remove('hidden');
+        revealBtn.classList.add('hidden');
+    } else {
+        modelWrap.classList.add('hidden');
+        revealBtn.classList.remove('hidden');
+    }
+}
+
+function saveTestEssayUserAnswer(val) {
+    const test = appState.tests.find(t => t.id === currentTestId);
+    if (!test) return;
+    test.questions[currentTestQuestionIndex].note = val;
+    hasUnsavedChanges = true;
+}
+
+function revealTestEssayAnswer() {
+    const test = appState.tests.find(t => t.id === currentTestId);
+    if (!test) return;
+    test.questions[currentTestQuestionIndex].essayRevealed = true;
+    hasUnsavedChanges = true;
+    renderCurrentTestQuestion();
+}
+
+function gradeTestEssay(score) {
+    const test = appState.tests.find(t => t.id === currentTestId);
+    if (!test) return;
+    test.questions[currentTestQuestionIndex].essayScore = score;
+    hasUnsavedChanges = true;
+    renderCurrentTestQuestion();
+    renderTestQuestionMap();
+}
+
+function toggleTestFlagCurrent() {
+    const test = appState.tests.find(t => t.id === currentTestId);
+    if (!test) return;
+    test.questions[currentTestQuestionIndex].flagged = !test.questions[currentTestQuestionIndex].flagged;
+    hasUnsavedChanges = true;
+    renderCurrentTestQuestion();
+}
+
+function prevTestQuestion() {
+    if (currentTestQuestionIndex > 0) {
+        currentTestQuestionIndex--;
+        renderCurrentTestQuestion();
+        renderTestQuestionMap();
+    }
+}
+
+function nextTestQuestion() {
+    const test = appState.tests.find(t => t.id === currentTestId);
+    if (test && currentTestQuestionIndex < test.questions.length - 1) {
+        currentTestQuestionIndex++;
+        renderCurrentTestQuestion();
+        renderTestQuestionMap();
+    }
+}
+
+function jumpToTestQuestion(idx) {
+    currentTestQuestionIndex = idx;
+    renderCurrentTestQuestion();
+    renderTestQuestionMap();
+}
+
+function clearTestCurrentAnswer() {
+    const test = appState.tests.find(t => t.id === currentTestId);
+    if (!test) return;
+    const q = test.questions[currentTestQuestionIndex];
+    q.userAnswer = null;
+    q.essayScore = null;
+    q.note = '';
+    hasUnsavedChanges = true;
+    renderCurrentTestQuestion();
+    renderTestQuestionMap();
+}
+
+function renderTestQuestionMap() {
+    const test = appState.tests.find(t => t.id === currentTestId);
+    if (!test) return;
+    const grid = document.getElementById('test-question-map-grid');
+    grid.innerHTML = test.questions.map((q, idx) => {
+        const answered = (q.type === 'mcq' && q.userAnswer) || (q.type === 'essay' && q.essayScore !== null);
+        const isCurrent = (idx === currentTestQuestionIndex);
+        const baseClass = answered ? 'bg-blue-900 text-white font-extrabold' : 'bg-slate-200 dark:bg-slate-800 text-slate-400';
+        const ring = isCurrent ? 'ring-2 ring-blue-500 scale-105' : '';
+        return `
+            <button type="button" onclick="jumpToTestQuestion(${idx})" class="h-10 rounded-xl text-xs flex items-center justify-center transition-all ${baseClass} ${ring}">
+                ${q.number}
+            </button>
+        `;
+    }).join('');
+}
+
+function initiateSubmitTest() {
+    const test = appState.tests.find(t => t.id === currentTestId);
+    if (!test) return;
+    let earned = 0;
+    let max = 0;
+
+    test.questions.forEach(q => {
+        const qMax = q.type === 'essay' ? 2 : 1;
+        max += qMax;
+        if (q.type === 'mcq') {
+            if (q.userAnswer === q.correctAnswer) {
+                q.status = 'correct';
+                earned += 1;
+            } else {
+                q.status = 'wrong';
+            }
+        } else if (q.type === 'essay') {
+            const sc = parseFloat(q.essayScore) || 0;
+            earned += sc;
+            if (sc === 2) q.status = 'correct';
+            else if (sc > 0) q.status = 'partial';
+            else q.status = 'wrong';
+        }
+    });
+
+    test.scoreEarned = earned;
+    test.scoreMax = max;
+    test.percentage = max > 0 ? Math.round((earned / max) * 100) : 0;
+    test.status = 'completed';
+
+    persistState();
+    hasUnsavedChanges = false;
+    window.location.href = 'test_dashboard.html';
+}
+
+function attemptExitTestSolve() {
+    if (hasUnsavedChanges) {
+        if (confirm('هل تريد الخروج وحفظ التقدم؟')) {
+            persistState();
+        }
+    }
+    window.location.href = 'tests.html';
+}
+
+function initTestDashboardPage() {
+    const testId = localStorage.getItem(ACTIVE_TEST_KEY);
+    const test = appState.tests.find(t => t.id === testId);
+    if (!test) {
+        window.location.href = 'tests.html';
+        return;
+    }
+
+    document.getElementById('tdash-subject-tag').textContent = test.subject;
+    document.getElementById('tdash-title').textContent = test.title;
+    document.getElementById('tdash-subtitle').textContent = `${test.book} • ${test.chapter} • ${test.createdAt}`;
+    document.getElementById('tdash-score-fraction').textContent = `${test.scoreEarned} / ${test.scoreMax}`;
+    document.getElementById('tdash-score-percent').textContent = `${test.percentage}%`;
+
+    const container = document.getElementById('tdash-questions-list');
+    container.innerHTML = test.questions.map((q, idx) => {
+        let badge = q.status === 'correct' ? '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">صحيح ✅</span>' : '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-800">خطأ ❌</span>';
+        
+        return `
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="font-black text-sm">سؤال ${q.number}</span>
+                    ${badge}
+                </div>
+                <p class="text-sm font-bold">${escapeHtml(q.questionText)}</p>
+                ${q.type === 'mcq' ? `
+                    <div class="text-xs space-y-1">
+                        <p>إجابتك: <strong class="text-blue-900 dark:text-blue-400">${q.userAnswer || 'لم تجب'}</strong></p>
+                        <p>الإجابة الصحيحة: <strong class="text-emerald-600">${q.correctAnswer}</strong></p>
+                    </div>
+                ` : `
+                    <div class="text-xs space-y-1">
+                        <p>إجابتك المقالية: <strong>${escapeHtml(q.note || 'بدون إجابة')}</strong></p>
+                        <p>نموذج الإجابة: <strong class="text-emerald-600">${escapeHtml(q.correctAnswer)}</strong></p>
+                        <p>تقييمك: <strong>${q.essayScore ?? 0} / 2</strong></p>
+                    </div>
+                `}
+                ${q.explanation ? `
+                    <div class="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-xs text-blue-900 dark:text-blue-200">
+                        <strong>الشرح والتفسير:</strong> ${escapeHtml(q.explanation)}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+function renderTestsArchive() {
+    const container = document.getElementById('tests-archive-list');
+    if (!container) return;
+
+    if (!appState.tests || appState.tests.length === 0) {
+        container.innerHTML = `<div class="col-span-full bg-white dark:bg-slate-900 rounded-3xl p-8 text-center border border-slate-200 dark:border-slate-800 text-slate-500 font-bold">مفيش اختبارات مضافة لسه. ارفع ملف JSON أو جرب الاختبار التجريبي!</div>`;
+        return;
+    }
+
+    container.innerHTML = appState.tests.map(test => `
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between gap-4">
+            <div>
+                <span class="text-xs font-extrabold text-blue-900 dark:text-blue-400">${escapeHtml(test.subject)}</span>
+                <h4 class="font-black text-base mt-1">${escapeHtml(test.title)}</h4>
+                <p class="text-xs text-slate-500 mt-0.5">${escapeHtml(test.book)} • ${escapeHtml(test.chapter)}</p>
+                <p class="text-[11px] text-slate-400 mt-2">${test.questions.length} سؤال • ${test.createdAt}</p>
+            </div>
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                <button onclick="openTestSolveView('${test.id}')" class="px-3.5 py-2 rounded-xl bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold">
+                    ${test.status === 'completed' ? 'إعادة الاختبار' : 'بدء الحل'}
+                </button>
+                ${test.status === 'completed' ? `
+                    <button onclick="localStorage.setItem(ACTIVE_TEST_KEY, '${test.id}'); window.location.href='test_dashboard.html';" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+                        النتيجة (${test.percentage}%)
+                    </button>
+                ` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+// =========================================================================
+// EXISTING HOMEWORK & UTILITY FUNCTIONS (PRESERVED)
+// =========================================================================
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('hidden');
+}
+
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+}
+
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl text-xs sm:text-sm font-bold flex items-center gap-2 pointer-events-auto`;
+    toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function escapeHtml(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 window.addEventListener('DOMContentLoaded', initApp);
